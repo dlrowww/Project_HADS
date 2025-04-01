@@ -1,15 +1,22 @@
 from flask import Flask, request, jsonify, Response
 import requests
 import json
+import pymongo
 
 app = Flask(__name__)
 
-# 示例城市 ID 映射，可根据需要扩展
+# MongoDB 配置
+client = pymongo.MongoClient("mongodb://db:27017/")
+db = client["transport"]
+collection = db["flixbus_trips"]
+
+# 城市映射
 city_map = {
     "Warsaw": "40e19c59-8646-11e6-9066-549f350fcb0c",
     "Gdansk": "40de6982-8646-11e6-9066-549f350fcb0c"
 }
 
+# 核心抓取函数
 def flixbus_scrape(from_city, to_city, date):
     url = "https://global.api.flixbus.com/search/service/v4/search"
     params = {
@@ -33,24 +40,25 @@ def flixbus_scrape(from_city, to_city, date):
     data = response.json()
 
     trips = data.get("trips", [])
+    results = []
 
-    # 打印第一个示例（仅打印一次）
-    if trips:
-        print("示例 Trip 数据结构：")
-        print(json.dumps(trips[0], indent=2, ensure_ascii=False))
-
-    result = []
     for t in trips:
-        result.append({
-            "departure": t.get("departure"),
-            "arrival": t.get("arrival"),
-            "from": t.get("from", {}).get("name"),
-            "to": t.get("to", {}).get("name"),
-            "price": t.get("price", {}).get("amount")
-        })
+        trip_results = t.get("results", {})
+        for uid, details in trip_results.items():
+            results.append({
+                "uid": uid,
+                "status": details.get("status"),
+                "transfer_type": details.get("transfer_type"),
+                "departure_date": details.get("departure", {}).get("date"),
+                "arrival_date": details.get("arrival", {}).get("date"),
+                "price_total": details.get("price", {}).get("total"),
+                "available_seats": details.get("available", {}).get("seats"),
+                "intermediate_stations_count": details.get("intermediate_stations_count")
+            })
 
-    return result
+    return results
 
+# 接口路由
 @app.route("/flixbus", methods=["GET"])
 def scrape_flixbus():
     from_city = request.args.get("from", "Warsaw")
@@ -58,13 +66,22 @@ def scrape_flixbus():
     date = request.args.get("date", "31.05.2025")
 
     try:
-        trips = flixbus_scrape(from_city, to_city, date)
+        data = flixbus_scrape(from_city, to_city, date)
+
+        # 清除旧数据并写入新数据
+        collection.delete_many({})
+        if data:
+            collection.insert_many(data)
+
+        # 取出并返回（去除 _id）
+        cursor = collection.find({}, {"_id": 0})
+        result = list(cursor)
 
         return Response(
             json.dumps({
                 "message": f"Trips from {from_city} to {to_city} on {date}",
-                "count": len(trips),
-                "data": trips
+                "count": len(result),
+                "data": result
             }, indent=2, ensure_ascii=False),
             content_type="application/json"
         )
@@ -72,5 +89,6 @@ def scrape_flixbus():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# 运行服务
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001)
