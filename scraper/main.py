@@ -1,26 +1,28 @@
-from flask import Flask, jsonify,Response
-import json
-import pymongo
+from flask import Flask, request, jsonify, Response
 import requests
-
+import json
 
 app = Flask(__name__)
 
-# Connect to MongoDB
-client = pymongo.MongoClient("mongodb://db:27017/")
-db = client["food"]
-collection = db["restaurants"]
+# 示例城市 ID 映射，可根据需要扩展
+city_map = {
+    "Warsaw": "40e19c59-8646-11e6-9066-549f350fcb0c",
+    "Gdansk": "40de6982-8646-11e6-9066-549f350fcb0c"
+}
 
-# Core scraping function - calls the official Pyszne API
-def real_scrape():
-    url = "https://rest.api.eu-central-1.production.jet-external.com/discovery/pl/restaurants/enriched"
+def flixbus_scrape(from_city, to_city, date):
+    url = "https://global.api.flixbus.com/search/service/v4/search"
     params = {
-        "latitude": 51.73747,
-        "longitude": 19.43193,
-        "serviceType": "delivery",
-        "ratingsOutOfFive": "true",
-        "je-tgl-ops_include_closed": "true",
-        "je-tgl-tmp_banners": "true"
+        "from_city_id": city_map.get(from_city),
+        "to_city_id": city_map.get(to_city),
+        "departure_date": date,
+        "products": '{"adult":1}',
+        "currency": "USD",
+        "locale": "en_US",
+        "search_by": "cities",
+        "include_after_midnight_rides": 1,
+        "disable_distribusion_trips": 0,
+        "disable_global_trips": 0
     }
     headers = {
         "User-Agent": "Mozilla/5.0",
@@ -30,47 +32,44 @@ def real_scrape():
     response = requests.get(url, params=params, headers=headers)
     data = response.json()
 
-    print("Example record:", data["restaurants"][0])  # Debug: show sample structure
+    trips = data.get("trips", [])
 
-    restaurants = []
-    for r in data.get("restaurants", []):
-        restaurants.append({
-            "name": r.get("name"),
-            "rating": r.get("rating", {}).get("starRating"),
-            "city": r.get("address", {}).get("city"),
-            "address": r.get("address", {}).get("firstLine"),
-            "eta": r.get("deliveryEtaMinutes"),
-            "delivery_cost": r.get("deliveryCost"),
-            "min_delivery_value": r.get("minimumDeliveryValue")
+    # 打印第一个示例（仅打印一次）
+    if trips:
+        print("示例 Trip 数据结构：")
+        print(json.dumps(trips[0], indent=2, ensure_ascii=False))
+
+    result = []
+    for t in trips:
+        result.append({
+            "departure": t.get("departure"),
+            "arrival": t.get("arrival"),
+            "from": t.get("from", {}).get("name"),
+            "to": t.get("to", {}).get("name"),
+            "price": t.get("price", {}).get("amount")
         })
 
-    return restaurants
+    return result
 
-# Flask route
-@app.route("/scrape", methods=["GET"])
-def scrape():
+@app.route("/flixbus", methods=["GET"])
+def scrape_flixbus():
+    from_city = request.args.get("from", "Warsaw")
+    to_city = request.args.get("to", "Gdansk")
+    date = request.args.get("date", "31.05.2025")
+
     try:
-        data = real_scrape()
-        print(f"Scraped {len(data)} restaurants, saving to database...")
+        trips = flixbus_scrape(from_city, to_city, date)
 
-        # 清空旧数据并插入新数据
-        collection.delete_many({})
-        if data:
-            collection.insert_many(data)
+        return Response(
+            json.dumps({
+                "message": f"Trips from {from_city} to {to_city} on {date}",
+                "count": len(trips),
+                "data": trips
+            }, indent=2, ensure_ascii=False),
+            content_type="application/json"
+        )
 
-        # 查询并返回（不包含 _id）
-        cursor = collection.find({}, {"_id": 0})
-        result = list(cursor)
-
-        json_str = json.dumps({
-            "message": "Scraped from Pyszne.pl API",
-            "count": len(result),
-            "data": result
-        }, indent=2,ensure_ascii=False)
-
-        return Response(json_str, content_type='application/json')
     except Exception as e:
-        print("Scrape failed:", str(e))
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
