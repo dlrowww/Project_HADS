@@ -1,6 +1,8 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify,Response
+import json
 import pymongo
 import requests
+
 
 app = Flask(__name__)
 
@@ -9,7 +11,7 @@ client = pymongo.MongoClient("mongodb://db:27017/")
 db = client["food"]
 collection = db["restaurants"]
 
-# Actual scraping function: Call the API
+# Core scraping function - calls the official Pyszne API
 def real_scrape():
     url = "https://rest.api.eu-central-1.production.jet-external.com/discovery/pl/restaurants/enriched"
     params = {
@@ -28,16 +30,20 @@ def real_scrape():
     response = requests.get(url, params=params, headers=headers)
     data = response.json()
 
-    print("Example record:", data["restaurants"][0])
+    print("Example record:", data["restaurants"][0])  # Debug: show sample structure
 
     restaurants = []
     for r in data.get("restaurants", []):
-        name = r.get("name")
-        rating = r.get("rating", {}).get("starRating")
         restaurants.append({
-            "name": name,
-            "rating": rating
+            "name": r.get("name"),
+            "rating": r.get("rating", {}).get("starRating"),
+            "city": r.get("address", {}).get("city"),
+            "address": r.get("address", {}).get("firstLine"),
+            "eta": r.get("deliveryEtaMinutes"),
+            "delivery_cost": r.get("deliveryCost"),
+            "min_delivery_value": r.get("minimumDeliveryValue")
         })
+
     return restaurants
 
 # Flask route
@@ -45,26 +51,26 @@ def real_scrape():
 def scrape():
     try:
         data = real_scrape()
-        print(f"Fetched {len(data)} records, saving to database...")
+        print(f"Scraped {len(data)} restaurants, saving to database...")
 
-        for item in data:
-            print(f"[Scrape] {item['name']} ***** {item['rating']}")
-
-        # Clear old records before inserting new ones
+        # 清空旧数据并插入新数据
         collection.delete_many({})
         if data:
             collection.insert_many(data)
 
+        # 查询并返回（不包含 _id）
         cursor = collection.find({}, {"_id": 0})
-        data = list(cursor)
+        result = list(cursor)
 
-        return jsonify({
+        json_str = json.dumps({
             "message": "Scraped from Pyszne.pl API",
-            "count": len(data),
-            "data": data
-        })
+            "count": len(result),
+            "data": result
+        }, indent=2,ensure_ascii=False)
+
+        return Response(json_str, content_type='application/json')
     except Exception as e:
-        print("Scraping failed:", str(e))
+        print("Scrape failed:", str(e))
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
