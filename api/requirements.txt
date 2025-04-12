@@ -1,7 +1,0 @@
-flask
-fastapi
-pymongo
-uvicorn
-
-
-

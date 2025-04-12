@@ -1,0 +1,15 @@
+/home/simon/Project_HADS/Availability.Application/bin/Debug/net8.0/Availability.Application.deps.json
+/home/simon/Project_HADS/Availability.Application/bin/Debug/net8.0/Availability.Application.dll
+/home/simon/Project_HADS/Availability.Application/bin/Debug/net8.0/Availability.Application.pdb
+/home/simon/Project_HADS/Availability.Application/bin/Debug/net8.0/Availability.Domain.dll
+/home/simon/Project_HADS/Availability.Application/bin/Debug/net8.0/Availability.Domain.pdb
+/home/simon/Project_HADS/Availability.Application/obj/Debug/net8.0/Availability.Application.csproj.AssemblyReference.cache
+/home/simon/Project_HADS/Availability.Application/obj/Debug/net8.0/Availability.Application.GeneratedMSBuildEditorConfig.editorconfig
+/home/simon/Project_HADS/Availability.Application/obj/Debug/net8.0/Availability.Application.AssemblyInfoInputs.cache
+/home/simon/Project_HADS/Availability.Application/obj/Debug/net8.0/Availability.Application.AssemblyInfo.cs
+/home/simon/Project_HADS/Availability.Application/obj/Debug/net8.0/Availability.Application.csproj.CoreCompileInputs.cache
+/home/simon/Project_HADS/Availability.Application/obj/Debug/net8.0/Availability.Application.csproj.CopyComplete
+/home/simon/Project_HADS/Availability.Application/obj/Debug/net8.0/Availability.Application.dll
+/home/simon/Project_HADS/Availability.Application/obj/Debug/net8.0/refint/Availability.Application.dll
+/home/simon/Project_HADS/Availability.Application/obj/Debug/net8.0/Availability.Application.pdb
+/home/simon/Project_HADS/Availability.Application/obj/Debug/net8.0/ref/Availability.Application.dll

@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "duR+ZUbwE1/hk4NEbaAa3y7TES+gwCCJhSuGdGTkRD8=",
+  "Source": "OfferInventory.API",
+  "BasePath": "_content/OfferInventory.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

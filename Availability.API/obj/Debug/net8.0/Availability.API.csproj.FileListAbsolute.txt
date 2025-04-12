@@ -1,0 +1,7 @@
+/home/simon/Project_HADS/Availability.API/obj/Debug/net8.0/Availability.API.csproj.AssemblyReference.cache
+/home/simon/Project_HADS/Availability.API/obj/Debug/net8.0/Availability.API.GeneratedMSBuildEditorConfig.editorconfig
+/home/simon/Project_HADS/Availability.API/obj/Debug/net8.0/Availability.API.AssemblyInfoInputs.cache
+/home/simon/Project_HADS/Availability.API/obj/Debug/net8.0/Availability.API.AssemblyInfo.cs
+/home/simon/Project_HADS/Availability.API/obj/Debug/net8.0/Availability.API.csproj.CoreCompileInputs.cache
+/home/simon/Project_HADS/Availability.API/obj/Debug/net8.0/Availability.API.MvcApplicationPartsAssemblyInfo.cs
+/home/simon/Project_HADS/Availability.API/obj/Debug/net8.0/Availability.API.MvcApplicationPartsAssemblyInfo.cache

@@ -1,0 +1,11 @@
+/home/simon/Project_HADS/Availability.Domain/bin/Debug/net8.0/Availability.Domain.deps.json
+/home/simon/Project_HADS/Availability.Domain/bin/Debug/net8.0/Availability.Domain.dll
+/home/simon/Project_HADS/Availability.Domain/bin/Debug/net8.0/Availability.Domain.pdb
+/home/simon/Project_HADS/Availability.Domain/obj/Debug/net8.0/Availability.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/home/simon/Project_HADS/Availability.Domain/obj/Debug/net8.0/Availability.Domain.AssemblyInfoInputs.cache
+/home/simon/Project_HADS/Availability.Domain/obj/Debug/net8.0/Availability.Domain.AssemblyInfo.cs
+/home/simon/Project_HADS/Availability.Domain/obj/Debug/net8.0/Availability.Domain.csproj.CoreCompileInputs.cache
+/home/simon/Project_HADS/Availability.Domain/obj/Debug/net8.0/Availability.Domain.dll
+/home/simon/Project_HADS/Availability.Domain/obj/Debug/net8.0/refint/Availability.Domain.dll
+/home/simon/Project_HADS/Availability.Domain/obj/Debug/net8.0/Availability.Domain.pdb
+/home/simon/Project_HADS/Availability.Domain/obj/Debug/net8.0/ref/Availability.Domain.dll

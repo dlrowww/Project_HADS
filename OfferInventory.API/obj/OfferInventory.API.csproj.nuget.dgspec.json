@@ -1,0 +1,265 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/simon/Project_HADS/OfferInventory.API/OfferInventory.API.csproj": {}
+  },
+  "projects": {
+    "/home/simon/Project_HADS/OfferInventory.API/OfferInventory.API.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/simon/Project_HADS/OfferInventory.API/OfferInventory.API.csproj",
+        "projectName": "OfferInventory.API",
+        "projectPath": "/home/simon/Project_HADS/OfferInventory.API/OfferInventory.API.csproj",
+        "packagesPath": "/home/simon/.nuget/packages/",
+        "outputPath": "/home/simon/Project_HADS/OfferInventory.API/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/simon/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/home/simon/Project_HADS/OfferInventory.Application/OfferInventory.Application.csproj": {
+                "projectPath": "/home/simon/Project_HADS/OfferInventory.Application/OfferInventory.Application.csproj"
+              },
+              "/home/simon/Project_HADS/OfferInventory.Infrastructure/OfferInventory.Infrastructure.csproj": {
+                "projectPath": "/home/simon/Project_HADS/OfferInventory.Infrastructure/OfferInventory.Infrastructure.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.AspNetCore.OpenApi": {
+              "target": "Package",
+              "version": "[8.0.14, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.4, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.6.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.114/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/simon/Project_HADS/OfferInventory.Application/OfferInventory.Application.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/simon/Project_HADS/OfferInventory.Application/OfferInventory.Application.csproj",
+        "projectName": "OfferInventory.Application",
+        "projectPath": "/home/simon/Project_HADS/OfferInventory.Application/OfferInventory.Application.csproj",
+        "packagesPath": "/home/simon/.nuget/packages/",
+        "outputPath": "/home/simon/Project_HADS/OfferInventory.Application/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/simon/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/home/simon/Project_HADS/OfferInventory.Domain/OfferInventory.Domain.csproj": {
+                "projectPath": "/home/simon/Project_HADS/OfferInventory.Domain/OfferInventory.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.114/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/simon/Project_HADS/OfferInventory.Domain/OfferInventory.Domain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/simon/Project_HADS/OfferInventory.Domain/OfferInventory.Domain.csproj",
+        "projectName": "OfferInventory.Domain",
+        "projectPath": "/home/simon/Project_HADS/OfferInventory.Domain/OfferInventory.Domain.csproj",
+        "packagesPath": "/home/simon/.nuget/packages/",
+        "outputPath": "/home/simon/Project_HADS/OfferInventory.Domain/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/simon/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.114/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/simon/Project_HADS/OfferInventory.Infrastructure/OfferInventory.Infrastructure.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/simon/Project_HADS/OfferInventory.Infrastructure/OfferInventory.Infrastructure.csproj",
+        "projectName": "OfferInventory.Infrastructure",
+        "projectPath": "/home/simon/Project_HADS/OfferInventory.Infrastructure/OfferInventory.Infrastructure.csproj",
+        "packagesPath": "/home/simon/.nuget/packages/",
+        "outputPath": "/home/simon/Project_HADS/OfferInventory.Infrastructure/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/simon/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/home/simon/Project_HADS/OfferInventory.Application/OfferInventory.Application.csproj": {
+                "projectPath": "/home/simon/Project_HADS/OfferInventory.Application/OfferInventory.Application.csproj"
+              },
+              "/home/simon/Project_HADS/OfferInventory.Domain/OfferInventory.Domain.csproj": {
+                "projectPath": "/home/simon/Project_HADS/OfferInventory.Domain/OfferInventory.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.4, )"
+            },
+            "Microsoft.EntityFrameworkCore.InMemory": {
+              "target": "Package",
+              "version": "[9.0.4, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.114/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
