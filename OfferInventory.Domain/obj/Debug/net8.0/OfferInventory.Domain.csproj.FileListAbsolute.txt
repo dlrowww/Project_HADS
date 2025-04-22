@@ -5,6 +5,7 @@
 /home/simon/Project_HADS/OfferInventory.Domain/obj/Debug/net8.0/OfferInventory.Domain.AssemblyInfoInputs.cache
 /home/simon/Project_HADS/OfferInventory.Domain/obj/Debug/net8.0/OfferInventory.Domain.AssemblyInfo.cs
 /home/simon/Project_HADS/OfferInventory.Domain/obj/Debug/net8.0/OfferInventory.Domain.csproj.CoreCompileInputs.cache
+/home/simon/Project_HADS/OfferInventory.Domain/obj/Debug/net8.0/OfferInventory.Domain.sourcelink.json
 /home/simon/Project_HADS/OfferInventory.Domain/obj/Debug/net8.0/OfferInventory.Domain.dll
 /home/simon/Project_HADS/OfferInventory.Domain/obj/Debug/net8.0/refint/OfferInventory.Domain.dll
 /home/simon/Project_HADS/OfferInventory.Domain/obj/Debug/net8.0/OfferInventory.Domain.pdb

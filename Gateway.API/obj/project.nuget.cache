@@ -1,8 +1,16 @@
 {
   "version": 2,
-  "dgSpecHash": "qh+jATjvDGB8C3HdgL58qkj2F3gXRlJ88aYrDFA5wPDSgOrJxju2s/DwDkhGsDXiXSk4ZkF2PqEXoDj2uOHaTQ==",
+  "dgSpecHash": "O4rcvNjTilqoowrkIB7Ehov82kUjaaQOzsqOyGKjRu1w7h6lI3hjL0UkFAHvrVHtehpNxlHZaVqu9uKX5+bmJQ==",
   "success": true,
   "projectFilePath": "/home/simon/Project_HADS/Gateway.API/Gateway.API.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/home/simon/.nuget/packages/microsoft.aspnetcore.openapi/8.0.0/microsoft.aspnetcore.openapi.8.0.0.nupkg.sha512",
+    "/home/simon/.nuget/packages/microsoft.extensions.apidescription.server/6.0.5/microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
+    "/home/simon/.nuget/packages/microsoft.openapi/1.4.3/microsoft.openapi.1.4.3.nupkg.sha512",
+    "/home/simon/.nuget/packages/swashbuckle.aspnetcore/6.5.0/swashbuckle.aspnetcore.6.5.0.nupkg.sha512",
+    "/home/simon/.nuget/packages/swashbuckle.aspnetcore.swagger/6.5.0/swashbuckle.aspnetcore.swagger.6.5.0.nupkg.sha512",
+    "/home/simon/.nuget/packages/swashbuckle.aspnetcore.swaggergen/6.5.0/swashbuckle.aspnetcore.swaggergen.6.5.0.nupkg.sha512",
+    "/home/simon/.nuget/packages/swashbuckle.aspnetcore.swaggerui/6.5.0/swashbuckle.aspnetcore.swaggerui.6.5.0.nupkg.sha512"
+  ],
   "logs": []
 }

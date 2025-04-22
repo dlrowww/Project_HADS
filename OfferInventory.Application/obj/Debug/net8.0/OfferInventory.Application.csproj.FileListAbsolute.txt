@@ -8,6 +8,7 @@
 /home/simon/Project_HADS/OfferInventory.Application/obj/Debug/net8.0/OfferInventory.Application.AssemblyInfoInputs.cache
 /home/simon/Project_HADS/OfferInventory.Application/obj/Debug/net8.0/OfferInventory.Application.AssemblyInfo.cs
 /home/simon/Project_HADS/OfferInventory.Application/obj/Debug/net8.0/OfferInventory.Application.csproj.CoreCompileInputs.cache
+/home/simon/Project_HADS/OfferInventory.Application/obj/Debug/net8.0/OfferInventory.Application.sourcelink.json
 /home/simon/Project_HADS/OfferInventory.Application/obj/Debug/net8.0/OfferInventory.Application.csproj.CopyComplete
 /home/simon/Project_HADS/OfferInventory.Application/obj/Debug/net8.0/OfferInventory.Application.dll
 /home/simon/Project_HADS/OfferInventory.Application/obj/Debug/net8.0/refint/OfferInventory.Application.dll

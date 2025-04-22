@@ -1,22 +1,21 @@
 {
   "version": 2,
-  "dgSpecHash": "/2kNp8Hf6V08/AP9kJ81v4P0Gn01VbOfKYwj8Fq+tkzRqXzdhnRgH6Gn+PVSZ23hcFS4BfSTfB7Z6cVUrTp+IA==",
+  "dgSpecHash": "IQfXXwgWJs+DL5Wwr5NZcqX/r9XQH0SBGjevtm6T62zxOLvYHfEqtVRIhWkbVzSb5xvc+yaKpwXTnP1O4KEw2w==",
   "success": true,
   "projectFilePath": "/home/simon/Project_HADS/OfferInventory.Infrastructure/OfferInventory.Infrastructure.csproj",
   "expectedPackageFiles": [
-    "/home/simon/.nuget/packages/microsoft.entityframeworkcore/9.0.4/microsoft.entityframeworkcore.9.0.4.nupkg.sha512",
-    "/home/simon/.nuget/packages/microsoft.entityframeworkcore.abstractions/9.0.4/microsoft.entityframeworkcore.abstractions.9.0.4.nupkg.sha512",
-    "/home/simon/.nuget/packages/microsoft.entityframeworkcore.analyzers/9.0.4/microsoft.entityframeworkcore.analyzers.9.0.4.nupkg.sha512",
-    "/home/simon/.nuget/packages/microsoft.entityframeworkcore.inmemory/9.0.4/microsoft.entityframeworkcore.inmemory.9.0.4.nupkg.sha512",
-    "/home/simon/.nuget/packages/microsoft.extensions.caching.abstractions/9.0.4/microsoft.extensions.caching.abstractions.9.0.4.nupkg.sha512",
-    "/home/simon/.nuget/packages/microsoft.extensions.caching.memory/9.0.4/microsoft.extensions.caching.memory.9.0.4.nupkg.sha512",
-    "/home/simon/.nuget/packages/microsoft.extensions.dependencyinjection/9.0.4/microsoft.extensions.dependencyinjection.9.0.4.nupkg.sha512",
-    "/home/simon/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/9.0.4/microsoft.extensions.dependencyinjection.abstractions.9.0.4.nupkg.sha512",
-    "/home/simon/.nuget/packages/microsoft.extensions.logging/9.0.4/microsoft.extensions.logging.9.0.4.nupkg.sha512",
-    "/home/simon/.nuget/packages/microsoft.extensions.logging.abstractions/9.0.4/microsoft.extensions.logging.abstractions.9.0.4.nupkg.sha512",
-    "/home/simon/.nuget/packages/microsoft.extensions.options/9.0.4/microsoft.extensions.options.9.0.4.nupkg.sha512",
-    "/home/simon/.nuget/packages/microsoft.extensions.primitives/9.0.4/microsoft.extensions.primitives.9.0.4.nupkg.sha512",
-    "/home/simon/.nuget/packages/system.diagnostics.diagnosticsource/9.0.4/system.diagnostics.diagnosticsource.9.0.4.nupkg.sha512"
+    "/home/simon/.nuget/packages/microsoft.entityframeworkcore/8.0.0/microsoft.entityframeworkcore.8.0.0.nupkg.sha512",
+    "/home/simon/.nuget/packages/microsoft.entityframeworkcore.abstractions/8.0.0/microsoft.entityframeworkcore.abstractions.8.0.0.nupkg.sha512",
+    "/home/simon/.nuget/packages/microsoft.entityframeworkcore.analyzers/8.0.0/microsoft.entityframeworkcore.analyzers.8.0.0.nupkg.sha512",
+    "/home/simon/.nuget/packages/microsoft.entityframeworkcore.inmemory/8.0.0/microsoft.entityframeworkcore.inmemory.8.0.0.nupkg.sha512",
+    "/home/simon/.nuget/packages/microsoft.extensions.caching.abstractions/8.0.0/microsoft.extensions.caching.abstractions.8.0.0.nupkg.sha512",
+    "/home/simon/.nuget/packages/microsoft.extensions.caching.memory/8.0.0/microsoft.extensions.caching.memory.8.0.0.nupkg.sha512",
+    "/home/simon/.nuget/packages/microsoft.extensions.dependencyinjection/8.0.0/microsoft.extensions.dependencyinjection.8.0.0.nupkg.sha512",
+    "/home/simon/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/8.0.0/microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
+    "/home/simon/.nuget/packages/microsoft.extensions.logging/8.0.0/microsoft.extensions.logging.8.0.0.nupkg.sha512",
+    "/home/simon/.nuget/packages/microsoft.extensions.logging.abstractions/8.0.0/microsoft.extensions.logging.abstractions.8.0.0.nupkg.sha512",
+    "/home/simon/.nuget/packages/microsoft.extensions.options/8.0.0/microsoft.extensions.options.8.0.0.nupkg.sha512",
+    "/home/simon/.nuget/packages/microsoft.extensions.primitives/8.0.0/microsoft.extensions.primitives.8.0.0.nupkg.sha512"
   ],
   "logs": []
 }

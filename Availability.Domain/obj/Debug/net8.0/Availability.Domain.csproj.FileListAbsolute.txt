@@ -9,3 +9,4 @@
 /home/simon/Project_HADS/Availability.Domain/obj/Debug/net8.0/refint/Availability.Domain.dll
 /home/simon/Project_HADS/Availability.Domain/obj/Debug/net8.0/Availability.Domain.pdb
 /home/simon/Project_HADS/Availability.Domain/obj/Debug/net8.0/ref/Availability.Domain.dll
+/home/simon/Project_HADS/Availability.Domain/obj/Debug/net8.0/Availability.Domain.sourcelink.json

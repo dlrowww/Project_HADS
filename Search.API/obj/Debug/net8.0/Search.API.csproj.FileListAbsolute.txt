@@ -17,6 +17,7 @@
 /home/simon/Project_HADS/Search.API/obj/Debug/net8.0/Search.API.csproj.CoreCompileInputs.cache
 /home/simon/Project_HADS/Search.API/obj/Debug/net8.0/Search.API.MvcApplicationPartsAssemblyInfo.cs
 /home/simon/Project_HADS/Search.API/obj/Debug/net8.0/Search.API.MvcApplicationPartsAssemblyInfo.cache
+/home/simon/Project_HADS/Search.API/obj/Debug/net8.0/Search.API.sourcelink.json
 /home/simon/Project_HADS/Search.API/obj/Debug/net8.0/staticwebassets.build.json
 /home/simon/Project_HADS/Search.API/obj/Debug/net8.0/staticwebassets.development.json
 /home/simon/Project_HADS/Search.API/obj/Debug/net8.0/staticwebassets/msbuild.Search.API.Microsoft.AspNetCore.StaticWebAssets.props

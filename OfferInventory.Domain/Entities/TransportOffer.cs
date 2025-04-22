@@ -1,22 +1,15 @@
-using OfferInventory.Domain.Enums;
-using OfferInventory.Domain.Entities;
-using System;
+namespace OfferInventory.Domain.Entities;
 
-
-namespace OfferInventory.Domain.Entities
+public class TransportOffer
 {
-    public class TransportOffer
-    {
-        public Guid Id { get; set; }
-        public TransportType Type { get; set; }
-        public string CarrierName { get; set; } = string.Empty;
-        public string Origin { get; set; } = string.Empty;
-        public string Destination { get; set; } = string.Empty;
-        public DateTime DepartureTime { get; set; }
-        public DateTime ArrivalTime { get; set; }
-
-        // 关联的座位信息
-        public List<Seat> Seats { get; set; } = new();
-    }
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public DateTime DepartureTime { get; set; }
+    public DateTime ArrivalTime   { get; set; }
+    public decimal  Price         { get; set; }
+    public string   Currency      { get; set; } = "USD";
+    public string   Provider      { get; set; } = "FakeProvider";
+    public string   FromCity      { get; set; } = "";
+    public string   ToCity        { get; set; } = "";
+    public int MaxSeats           { get; set; } = 50;
+    public int AvailableSeats     { get; set; } = 50;
 }
-

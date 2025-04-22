@@ -13,3 +13,4 @@
 /home/simon/Project_HADS/Availability.Infrastructure/obj/Debug/net8.0/refint/Availability.Infrastructure.dll
 /home/simon/Project_HADS/Availability.Infrastructure/obj/Debug/net8.0/Availability.Infrastructure.pdb
 /home/simon/Project_HADS/Availability.Infrastructure/obj/Debug/net8.0/ref/Availability.Infrastructure.dll
+/home/simon/Project_HADS/Availability.Infrastructure/obj/Debug/net8.0/Availability.Infrastructure.sourcelink.json

@@ -1,19 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <ItemGroup>
-    <ProjectReference Include="..\OfferInventory.Domain\OfferInventory.Domain.csproj" />
-    <ProjectReference Include="..\OfferInventory.Application\OfferInventory.Application.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.4" />
-  </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- EF Core 核心包，仅使用 InMemoryProvider，也可以按需添加 -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 引用领域层 -->
+    <ProjectReference Include="..\OfferInventory.Domain\OfferInventory.Domain.csproj" />
+  </ItemGroup>
 </Project>

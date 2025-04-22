@@ -1,15 +1,14 @@
 /home/simon/Project_HADS/OfferInventory.Infrastructure/bin/Debug/net8.0/OfferInventory.Infrastructure.deps.json
 /home/simon/Project_HADS/OfferInventory.Infrastructure/bin/Debug/net8.0/OfferInventory.Infrastructure.dll
 /home/simon/Project_HADS/OfferInventory.Infrastructure/bin/Debug/net8.0/OfferInventory.Infrastructure.pdb
-/home/simon/Project_HADS/OfferInventory.Infrastructure/bin/Debug/net8.0/OfferInventory.Application.dll
 /home/simon/Project_HADS/OfferInventory.Infrastructure/bin/Debug/net8.0/OfferInventory.Domain.dll
 /home/simon/Project_HADS/OfferInventory.Infrastructure/bin/Debug/net8.0/OfferInventory.Domain.pdb
-/home/simon/Project_HADS/OfferInventory.Infrastructure/bin/Debug/net8.0/OfferInventory.Application.pdb
 /home/simon/Project_HADS/OfferInventory.Infrastructure/obj/Debug/net8.0/OfferInventory.Infrastructure.csproj.AssemblyReference.cache
 /home/simon/Project_HADS/OfferInventory.Infrastructure/obj/Debug/net8.0/OfferInventory.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
 /home/simon/Project_HADS/OfferInventory.Infrastructure/obj/Debug/net8.0/OfferInventory.Infrastructure.AssemblyInfoInputs.cache
 /home/simon/Project_HADS/OfferInventory.Infrastructure/obj/Debug/net8.0/OfferInventory.Infrastructure.AssemblyInfo.cs
 /home/simon/Project_HADS/OfferInventory.Infrastructure/obj/Debug/net8.0/OfferInventory.Infrastructure.csproj.CoreCompileInputs.cache
+/home/simon/Project_HADS/OfferInventory.Infrastructure/obj/Debug/net8.0/OfferInventory.Infrastructure.sourcelink.json
 /home/simon/Project_HADS/OfferInventory.Infrastructure/obj/Debug/net8.0/OfferInventory.Infrastructure.csproj.CopyComplete
 /home/simon/Project_HADS/OfferInventory.Infrastructure/obj/Debug/net8.0/OfferInventory.Infrastructure.dll
 /home/simon/Project_HADS/OfferInventory.Infrastructure/obj/Debug/net8.0/refint/OfferInventory.Infrastructure.dll
