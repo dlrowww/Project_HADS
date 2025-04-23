@@ -8,66 +8,55 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Search.API.Models;
+using Microsoft.EntityFrameworkCore;
+using OfferInventory.Infrastructure.Data;  // 你的 AppDbContext
 
-namespace Search.API.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-public class OffersController : ControllerBase
+namespace Search.API.Controllers
 {
-    private readonly HttpClient _inventoryClient;
-
-    public OffersController(IHttpClientFactory factory)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class OffersController : ControllerBase
     {
-        _inventoryClient = factory.CreateClient("offerInventory");
-    }
+        private readonly AppDbContext _db;
+        public OffersController(AppDbContext db) => _db = db;
 
-    [HttpGet("search")]
-    public async Task<IActionResult> SearchAsync(
-        [FromQuery] int people,
-        [FromQuery] string? transport,
-        [FromQuery] DateTime date,
-        [FromQuery] bool promotion = false,
-        [FromQuery] string? origin = null,
-        [FromQuery] string? destination = null,
-        CancellationToken ct = default
-    )
-    {
-        // ✅ 添加这行日志调试输出
-        Console.WriteLine($"🔍 Incoming Query: people={people}, transport={transport}, date={date}, promotion={promotion}, origin={origin}, destination={destination}");
-
-        // 向 OfferInventory 拉取全部
-        var offers = await _inventoryClient.GetFromJsonAsync<List<TransportOfferDto>>("/api/offers", ct);
-        if (offers == null || offers.Count == 0)
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchOffers(
+            [FromQuery] string from,
+            [FromQuery] string to,
+            [FromQuery] DateOnly date,
+            [FromQuery] string transportType,
+            [FromQuery] int numberOfPeople,
+            [FromQuery] bool promoOnly)
         {
-            return Ok(Array.Empty<TransportOfferDto>());
+            var q = _db.TransportOffers.AsQueryable();
+
+            q = q.Where(o => o.FromCity == from && o.ToCity == to);
+            q = q.Where(o => o.DepartureDate == date);
+            if (!string.IsNullOrWhiteSpace(transportType))
+                q = q.Where(o => o.MeansOfTransport == transportType);
+            if (promoOnly)
+                q = q.Where(o => o.IsPromoted);
+            q = q.Where(o => o.SeatsAvailable >= numberOfPeople);
+
+            var list = await q
+                .Select(o => new TransportOfferDto
+                {
+                    Id             = o.Id,
+                    DepartureTime  = o.DepartureTime,
+                    ArrivalTime    = o.ArrivalTime,
+                    Price          = o.PriceTotal,
+                    Currency       = o.Currency,
+                    Provider       = o.Provider,
+                    FromCity       = o.FromCity,
+                    ToCity         = o.ToCity,
+                    AvailableSeats = o.SeatsAvailable,
+                    IsPromoted     = o.IsPromoted,
+                    Transport  = o.MeansOfTransport
+                })
+                .ToListAsync();
+
+            return Ok(list);
         }
-
-        // 本地筛选
-        var query = offers.AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(transport))
-            query = query.Where(x => x.TransportType.Equals(transport, StringComparison.OrdinalIgnoreCase));
-
-        if (!string.IsNullOrWhiteSpace(origin))
-            query = query.Where(x => x.FromCity == origin);
-
-        if (!string.IsNullOrWhiteSpace(destination))
-            query = query.Where(x => x.ToCity == destination);
-
-        query = query.Where(x => x.DepartureTime.Date == date.Date);
-        query = query.Where(x => x.AvailableSeats >= people);
-
-        Console.WriteLine($"🎯 Match count: {query.Count()}");
-
-        Console.WriteLine("🚀 Returning offers:");
-        foreach (var o in query)
-        {
-           Console.WriteLine($"🚌 {o.FromCity} -> {o.ToCity}, {o.TransportType}, Seats: {o.AvailableSeats}");
-        }
-
-
-
-        return Ok(query.ToList());
     }
 }

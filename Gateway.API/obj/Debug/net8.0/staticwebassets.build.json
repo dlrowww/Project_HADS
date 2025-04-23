@@ -1,11 +1,58 @@
 {
   "Version": 1,
-  "Hash": "/f6v7MOprQaDFiXUzKBURXXFMOhr2y5v9U0rFU35ZCU=",
+  "Hash": "4YBX4YkD2+T4bnhyVgnNv/yzoA3jtsQwf3LAPKeIdLU=",
   "Source": "Gateway.API",
   "BasePath": "_content/Gateway.API",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
-  "Assets": []
+  "DiscoveryPatterns": [
+    {
+      "Name": "Gateway.API/wwwroot",
+      "Source": "Gateway.API",
+      "ContentRoot": "/home/simon/Project_HADS/Gateway.API/wwwroot/",
+      "BasePath": "_content/Gateway.API",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "/home/simon/Project_HADS/Gateway.API/wwwroot/login.html",
+      "SourceId": "Gateway.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/simon/Project_HADS/Gateway.API/wwwroot/",
+      "BasePath": "_content/Gateway.API",
+      "RelativePath": "login.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/login.html"
+    },
+    {
+      "Identity": "/home/simon/Project_HADS/Gateway.API/wwwroot/search.html",
+      "SourceId": "Gateway.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/simon/Project_HADS/Gateway.API/wwwroot/",
+      "BasePath": "_content/Gateway.API",
+      "RelativePath": "search.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/search.html"
+    }
+  ]
 }

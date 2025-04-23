@@ -5,6 +5,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Configuration;
 using System.Net.Http;
+using Microsoft.EntityFrameworkCore;
+using OfferInventory.Infrastructure.Data;  // <-- 现在能识别了！
+using Search.API.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +28,13 @@ builder.Services.AddHttpClient("offerInventory", c =>
     c.BaseAddress = new Uri("http://localhost:5189");  // OfferInventory.API 端口
     c.Timeout = TimeSpan.FromSeconds(10);
 });
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// 添加这行：注册 AppDbContext
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

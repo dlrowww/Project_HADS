@@ -1,0 +1,1 @@
+{"ContentRoots":["/home/simon/Project_HADS/Gateway.API/wwwroot/"],"Root":{"Children":{"login.html":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"login.html"},"Patterns":null},"search.html":{"Children":null,"Asset":{"ContentRootIndex":0,"SubPath":"search.html"},"Patterns":null}},"Asset":null,"Patterns":[{"ContentRootIndex":0,"Pattern":"**","Depth":0}]}}

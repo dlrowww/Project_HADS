@@ -8,7 +8,12 @@
   <!-- 只有 ASP.NET Core 本身就够；如需日志/策略可再引入包 -->
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.13" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <ProjectReference Include="..\OfferInventory.Infrastructure\OfferInventory.Infrastructure.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
   </ItemGroup>
 
 </Project>

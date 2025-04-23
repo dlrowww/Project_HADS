@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;       // QueryString
-using System;
-using System.Net.Http;                 // HttpClient
-using System.Net.Http.Json;            // ReadFromJsonAsync
-using System.Threading;
 using System.Threading.Tasks;
-
+using System.Net.Http;
+using System.Net;
+using Microsoft.AspNetCore.Http;
+using System;
 
 namespace Gateway.API.Controllers
 {
@@ -13,44 +11,34 @@ namespace Gateway.API.Controllers
     [Route("api/[controller]")]
     public class OffersController : ControllerBase
     {
-        private readonly HttpClient _searchClient;
+        private readonly HttpClient _search;
 
-        public OffersController(IHttpClientFactory factory)
-        {
-            // 一定要和上面 Program.cs 里 AddHttpClient("search", ...) 对应
-            _searchClient = factory.CreateClient("search");
-        }
+        public OffersController(IHttpClientFactory factory) =>
+            _search = factory.CreateClient("search");
 
         [HttpGet("search")]
         public async Task<IActionResult> Search(
-            [FromQuery] int    people,
-            [FromQuery] string transport,
-            [FromQuery] DateTime date,
-            [FromQuery] bool   promotion,
             [FromQuery] string origin,
             [FromQuery] string destination,
-            CancellationToken  ct)
+            [FromQuery] DateTime date,
+            [FromQuery] string transport,
+            [FromQuery] int people,
+            [FromQuery] bool promotion)
         {
-            // 调试日志：确认 QueryString 正确
-            Console.WriteLine($"🔍 Incoming Query: people={people}, transport={transport}, date={date:yyyy-MM-dd}, promotion={promotion}, origin={origin}, destination={destination}");
-
-            // 拼接 ?a=1&b=2...
             var qs = new QueryString()
-                .Add("people",      people.ToString())
-                .Add("transport",   transport)
-                .Add("date",        date.ToString("yyyy-MM-dd"))
-                .Add("promotion",   promotion.ToString().ToLower())
-                .Add("origin",      origin)
-                .Add("destination", destination);
+                .Add("from",          origin)
+                .Add("to",            destination)
+                .Add("date",          date.ToString("yyyy-MM-dd"))
+                .Add("transportType", transport)
+                .Add("numberOfPeople",people.ToString())
+                .Add("promoOnly",     promotion.ToString().ToLower());
 
-            // 转发给 Search.API
-            var resp = await _searchClient.GetAsync($"/api/offers/search{qs}", ct);
+            var resp = await _search.GetAsync($"/api/offers/search{qs}");
             if (!resp.IsSuccessStatusCode)
-                return StatusCode((int)resp.StatusCode, "Search.API returned error");
+                return StatusCode((int)resp.StatusCode, "Search.API error");
 
-            // 直接 Passthrough JSON
-            var payload = await resp.Content.ReadFromJsonAsync<object>(cancellationToken: ct);
-            return Ok(payload);
+            var json = await resp.Content.ReadAsStringAsync();
+            return Content(json, "application/json");
         }
     }
 }

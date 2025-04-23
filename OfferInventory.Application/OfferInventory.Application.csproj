@@ -8,4 +8,21 @@
   <ItemGroup>
     <ProjectReference Include="..\OfferInventory.Domain\OfferInventory.Domain.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.13">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.13" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.13" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.3" />
+        <!-- 引用 Domain（如果还没引用） -->
+    <ProjectReference Include="..\OfferInventory.Domain\OfferInventory.Domain.csproj" />
+    <!-- 引用 Infrastructure -->
+    <ProjectReference Include="..\OfferInventory.Infrastructure\OfferInventory.Infrastructure.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
+  </ItemGroup>
 </Project>

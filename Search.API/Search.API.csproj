@@ -7,4 +7,8 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- **一定要**引用到你的 OfferInventory.Infrastructure -->
+    <ProjectReference Include="..\OfferInventory.Infrastructure\OfferInventory.Infrastructure.csproj" />
+  </ItemGroup>
 </Project>

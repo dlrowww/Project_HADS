@@ -1,0 +1,29 @@
+{
+  "Files": [
+    {
+      "Id": "/home/simon/Project_HADS/Gateway.API/wwwroot/login.html",
+      "PackagePath": "staticwebassets/login.html"
+    },
+    {
+      "Id": "/home/simon/Project_HADS/Gateway.API/wwwroot/search.html",
+      "PackagePath": "staticwebassets/search.html"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.Gateway.API.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.build.Gateway.API.props",
+      "PackagePath": "build\\Gateway.API.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.Gateway.API.props",
+      "PackagePath": "buildMultiTargeting\\Gateway.API.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.Gateway.API.props",
+      "PackagePath": "buildTransitive\\Gateway.API.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

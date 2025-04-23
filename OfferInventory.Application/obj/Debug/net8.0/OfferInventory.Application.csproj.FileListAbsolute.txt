@@ -1,8 +1,11 @@
 /home/simon/Project_HADS/OfferInventory.Application/bin/Debug/net8.0/OfferInventory.Application.deps.json
+/home/simon/Project_HADS/OfferInventory.Application/bin/Debug/net8.0/OfferInventory.Application.runtimeconfig.json
 /home/simon/Project_HADS/OfferInventory.Application/bin/Debug/net8.0/OfferInventory.Application.dll
 /home/simon/Project_HADS/OfferInventory.Application/bin/Debug/net8.0/OfferInventory.Application.pdb
 /home/simon/Project_HADS/OfferInventory.Application/bin/Debug/net8.0/OfferInventory.Domain.dll
+/home/simon/Project_HADS/OfferInventory.Application/bin/Debug/net8.0/OfferInventory.Infrastructure.dll
 /home/simon/Project_HADS/OfferInventory.Application/bin/Debug/net8.0/OfferInventory.Domain.pdb
+/home/simon/Project_HADS/OfferInventory.Application/bin/Debug/net8.0/OfferInventory.Infrastructure.pdb
 /home/simon/Project_HADS/OfferInventory.Application/obj/Debug/net8.0/OfferInventory.Application.csproj.AssemblyReference.cache
 /home/simon/Project_HADS/OfferInventory.Application/obj/Debug/net8.0/OfferInventory.Application.GeneratedMSBuildEditorConfig.editorconfig
 /home/simon/Project_HADS/OfferInventory.Application/obj/Debug/net8.0/OfferInventory.Application.AssemblyInfoInputs.cache
@@ -13,4 +16,5 @@
 /home/simon/Project_HADS/OfferInventory.Application/obj/Debug/net8.0/OfferInventory.Application.dll
 /home/simon/Project_HADS/OfferInventory.Application/obj/Debug/net8.0/refint/OfferInventory.Application.dll
 /home/simon/Project_HADS/OfferInventory.Application/obj/Debug/net8.0/OfferInventory.Application.pdb
+/home/simon/Project_HADS/OfferInventory.Application/obj/Debug/net8.0/OfferInventory.Application.genruntimeconfig.cache
 /home/simon/Project_HADS/OfferInventory.Application/obj/Debug/net8.0/ref/OfferInventory.Application.dll

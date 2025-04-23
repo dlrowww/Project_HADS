@@ -1,4 +1,5 @@
 /home/simon/Project_HADS/OfferInventory.Infrastructure/bin/Debug/net8.0/OfferInventory.Infrastructure.deps.json
+/home/simon/Project_HADS/OfferInventory.Infrastructure/bin/Debug/net8.0/OfferInventory.Infrastructure.runtimeconfig.json
 /home/simon/Project_HADS/OfferInventory.Infrastructure/bin/Debug/net8.0/OfferInventory.Infrastructure.dll
 /home/simon/Project_HADS/OfferInventory.Infrastructure/bin/Debug/net8.0/OfferInventory.Infrastructure.pdb
 /home/simon/Project_HADS/OfferInventory.Infrastructure/bin/Debug/net8.0/OfferInventory.Domain.dll
@@ -13,4 +14,5 @@
 /home/simon/Project_HADS/OfferInventory.Infrastructure/obj/Debug/net8.0/OfferInventory.Infrastructure.dll
 /home/simon/Project_HADS/OfferInventory.Infrastructure/obj/Debug/net8.0/refint/OfferInventory.Infrastructure.dll
 /home/simon/Project_HADS/OfferInventory.Infrastructure/obj/Debug/net8.0/OfferInventory.Infrastructure.pdb
+/home/simon/Project_HADS/OfferInventory.Infrastructure/obj/Debug/net8.0/OfferInventory.Infrastructure.genruntimeconfig.cache
 /home/simon/Project_HADS/OfferInventory.Infrastructure/obj/Debug/net8.0/ref/OfferInventory.Infrastructure.dll

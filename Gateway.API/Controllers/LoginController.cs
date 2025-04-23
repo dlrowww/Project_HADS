@@ -1,4 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using OfferInventory.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;    // AppDbContext
+using OfferInventory.Domain.Entities;          // User
+using System.Threading.Tasks;
+using System;
 
 namespace Gateway.API.Controllers;
 
@@ -6,13 +11,26 @@ namespace Gateway.API.Controllers;
 [Route("api/[controller]")]
 public class LoginController : ControllerBase
 {
-    [HttpPost]
-    public IActionResult Login([FromBody] LoginRequest request)
+    private readonly AppDbContext _context;
+
+    public LoginController(AppDbContext context)
     {
-        // 这里是假登录逻辑，可以换成真正的验证
-        if (request.Username == "admin" && request.Password == "1234")
+        _context = context;
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    {
+        
+        var users = await _context.Users.ToListAsync();
+        Console.WriteLine($"数据库中用户数: {users.Count}");
+
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Username == request.Username && u.Password == request.Password);
+
+        if (user != null)
         {
-            return Ok(new { token = "fake-jwt-token" });
+            return Ok(new { token = "real-token-or-id" });
         }
 
         return Unauthorized();
@@ -23,5 +41,7 @@ public class LoginController : ControllerBase
         public string Username { get; set; }
         public string Password { get; set; }
     }
-}
+    
 
+    
+}
