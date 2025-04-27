@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Search.API.Models;
 using Microsoft.EntityFrameworkCore;
 using OfferInventory.Infrastructure.Data;  // 你的 AppDbContext
+// AppDbContext 所在命名空间
 
 namespace Search.API.Controllers
 {
@@ -42,7 +43,8 @@ namespace Search.API.Controllers
             var list = await q
                 .Select(o => new TransportOfferDto
                 {
-                    Id             = o.Id,
+                    ShortId        = o.ShortId,       // ← 新增映射
+                    //Id             = o.Id,
                     DepartureTime  = o.DepartureTime,
                     ArrivalTime    = o.ArrivalTime,
                     Price          = o.PriceTotal,
@@ -52,7 +54,10 @@ namespace Search.API.Controllers
                     ToCity         = o.ToCity,
                     AvailableSeats = o.SeatsAvailable,
                     IsPromoted     = o.IsPromoted,
-                    Transport  = o.MeansOfTransport
+                    Transport      = o.MeansOfTransport,
+                    DurationHours = o.DurationHours,
+                    DurationMinutes = o.DurationMinutes
+
                 })
                 .ToListAsync();
 

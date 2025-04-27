@@ -1,5 +1,6 @@
 /home/simon/Project_HADS/Gateway.API/bin/Debug/net8.0/appsettings.Development.json
 /home/simon/Project_HADS/Gateway.API/bin/Debug/net8.0/appsettings.json
+/home/simon/Project_HADS/Gateway.API/bin/Debug/net8.0/Gateway.API.staticwebassets.runtime.json
 /home/simon/Project_HADS/Gateway.API/bin/Debug/net8.0/Gateway.API
 /home/simon/Project_HADS/Gateway.API/bin/Debug/net8.0/Gateway.API.deps.json
 /home/simon/Project_HADS/Gateway.API/bin/Debug/net8.0/Gateway.API.runtimeconfig.json
@@ -48,4 +49,3 @@
 /home/simon/Project_HADS/Gateway.API/obj/Debug/net8.0/Gateway.API.pdb
 /home/simon/Project_HADS/Gateway.API/obj/Debug/net8.0/Gateway.API.genruntimeconfig.cache
 /home/simon/Project_HADS/Gateway.API/obj/Debug/net8.0/ref/Gateway.API.dll
-/home/simon/Project_HADS/Gateway.API/bin/Debug/net8.0/Gateway.API.staticwebassets.runtime.json

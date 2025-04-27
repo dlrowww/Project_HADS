@@ -84,6 +84,10 @@ namespace OfferInventory.Infrastructure.Data.Migrations
                     b.Property<int>("SeatsAvailable")
                         .HasColumnType("int");
 
+                    b.Property<string>("ShortId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("longtext");

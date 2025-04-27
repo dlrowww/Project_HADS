@@ -1,129 +1,366 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Search Offers</title>
-<style>
- body{font-family:Arial;padding:20px;max-width:800px;margin:auto}
- label{display:block;margin-top:12px}
- select,input[type="number"]{width:200px;padding:4px}
- table{border-collapse:collapse;width:100%;margin-top:20px}
- th,td{border:1px solid #ccc;padding:6px;text-align:center}
- th{background:#f0f0f0}
- .err{color:#c42;font-weight:700;margin-top:14px}
-</style>
+  <meta charset="UTF-8" />
+  <title>Search Offers</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"/>
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #eeeeee;
+      /* 新增：给左侧导航留出空间 */
+      margin-left: 80px;
+      height: 100%;
+    }
+    .main-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    }
+
+    /* —— header —— */
+    .header {
+      background-color: #42e315;
+      color: white;
+      text-align: center;
+      padding: 30px 20px;
+      margin-left: -170px;
+      width: calc(100% + 180px);
+    }
+    .header h1 { margin: 0; font-size: 32px; }
+
+    /* —— controls —— */
+    .controls-section {
+      background: #ffffff;
+      padding: 20px;
+      margin-left: -170px;
+      width: calc(100% + 180px);
+    }
+    .controls-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 15px;
+      max-width: 1000px;
+      margin: auto;
+    }
+    label {
+      display: flex;
+      flex-direction: column;
+      font-weight: bold;
+    }
+    select,
+    input[type="number"],
+    input#date {
+      margin-top: 6px;
+      padding: 8px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: #fff;
+    }
+    .controls-container > button {
+      grid-column: 3;
+      grid-row: 2;
+      width: 100%;
+    }
+    button {
+      background: #0fb346;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 12px 18px;
+      font-size: 16px;
+      cursor: pointer;
+      grid-column: span 2;
+    }
+    button:hover { background: #277517; }
+    .err {
+      color: red;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    /* —— results —— */
+    .results-section {
+      background: #eeeeee;
+      padding: 20px;
+      margin-left: -140px;
+    }
+    .results-section h2 {
+      margin: 0 0 15px 0;
+      font-size: 24px;
+      display: none;
+    }
+    .results-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      max-width: 860px;
+      margin: auto;
+    }
+    #resultsTitle {
+      align-self: flex-start;
+      margin: 0 0 15px 0;
+    }
+
+    /* —— offer card —— */
+    .card {
+      display: flex;
+      justify-content: space-between;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      padding: 16px 24px;
+      width: 90%;
+    }
+    .card-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .time-row {
+      position: relative;
+      display: grid;
+      grid-template-columns: 75px 0.66fr 90px;
+      align-items: center;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .time-line {
+      grid-column: 2;
+      width: 100%;
+      height: 1px;
+      background: #ccc;
+      position: relative;
+    }
+    .date-on-line {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 13px;
+      color: #777;
+      margin: 0;
+      text-align: center;
+    }
+    /* 新增: 时长覆盖在线下方，不占文档流 */
+    .duration-on-line {
+      position: absolute;
+      top: 12px;        /* 刚好在线下方 */
+      left: 50%;
+      transform: translateX(-210%);
+      font-size: 13px;
+      color: #555;
+      white-space: nowrap;
+    }
+
+    .city-row {
+      display: grid;
+      grid-template-columns: 75px 0.66fr 90px;
+      width: 100%;
+      font-size: 15px;
+      color: #444;
+      margin-top: 6px; /* 控制与 time-row 之间的垂直间距 */
+    }
+    .city-row span:first-child { grid-column: 1; }
+    .city-row span:last-child  { grid-column: 3; }
+
+    .id-badge {
+      border: 1px solid #777;
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: fit-content;
+      margin-top: 10px;
+      margin-left: -8px;
+    }
+    .divider {
+      border-left: 1px solid #ccc;
+      margin: 0 6px;
+      height: 16px;
+    }
+
+    .card-right {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .price {
+      font-size: 20px;
+      font-weight: bold;
+      color: #222;
+    }
+    .seats {
+      font-size: 13px;
+      color: #666;
+      margin-top: 6px;
+    }
+    .continue-btn {
+      margin-top: 12px;
+      background: #a1e129;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 16px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-<h1>Search Offers</h1>
+  <!-- 注入左侧导航 -->
+  <div id="navbar"></div>
 
-<label>Origin:
-  <select id="origin"></select>
-</label>
+  <div class="header">
+    <h1>BusCrawler</h1>
+  </div>
 
-<label>Destination:
-  <select id="destination"></select>
-</label>
+  <div class="controls-section">
+    <div class="controls-container">
+      <label>
+        Origin:
+        <select id="origin"></select>
+      </label>
+      <label>
+        Destination:
+        <select id="destination"></select>
+      </label>
+      <label>
+        Date:
+        <input id="date" type="text" readonly />
+      </label>
+      <label>
+        Number of People:
+        <input id="people" type="number" value="1" min="1"/>
+      </label>
+      <button id="searchBtn">Search</button>
+    </div>
+    <p id="msg" class="err"></p>
+  </div>
 
-<label>Date:
-  <select id="date"></select>
-</label>
+  <div class="results-section">
+    <div id="results" class="results-container">
+      <h2 id="resultsTitle">Results:</h2>
+    </div>
+  </div>
 
-<label>Transport Type:
-  <select id="transport">
-    <option value="bus">Bus</option>
-    <option value="train">Train</option>
-    <option value="flight">Flight</option>
-  </select>
-</label>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script>
+    const cities = ["Gdańsk","Warsaw","Katowice","Wrocław","Łódź","Kraków","Poznań","Szczecin","Lublin","Białystok"];
+    const originSel = document.getElementById("origin");
+    const destSel   = document.getElementById("destination");
+    cities.forEach(c => {
+      originSel.innerHTML += `<option value="${c}">${c}</option>`;
+      destSel.innerHTML   += `<option value="${c}">${c}</option>`;
+    });
+    originSel.value = cities[0];
+    destSel.value   = cities[1];
 
-<label>Number of People:
-  <input type="number" id="people" value="1" min="1" />
-</label>
+    // 初始化 flatpickr
+    const dateInput = document.getElementById("date");
+    const today     = new Date();
+    flatpickr(dateInput, {
+      dateFormat: "Y-m-d",
+      defaultDate: today,
+      minDate: today,
+      maxDate: new Date().fp_incr(6),
+      showMonths: 2,
+      allowInput: false
+    });
 
-<label>
-  <input type="checkbox" id="promotion" /> Promotion Only
-</label>
+    document.getElementById("searchBtn").onclick = async () => {
+      document.getElementById("msg").textContent = "";
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = '<h2 id="resultsTitle">Results:</h2>';
+      document.getElementById("resultsTitle").style.display = "block";
 
-<button id="searchBtn">Search</button>
-<p id="msg" class="err"></p>
+      const qs = new URLSearchParams({
+        origin:      originSel.value,
+        destination: destSel.value,
+        date:        dateInput.value,
+        transport:   "bus",
+        people:      document.getElementById("people").value
+      });
 
-<h2>Results:</h2>
-<div id="results"></div>
+      let resp;
+      try {
+        resp = await fetch(`/api/offers/search?${qs.toString()}`);
+      } catch (e) {
+        document.getElementById("msg").textContent = "Network error";
+        return;
+      }
+      if (!resp.ok) {
+        document.getElementById("msg").textContent = `Error ${resp.status}`;
+        return;
+      }
 
-<script>
-const cities = [
-  "Gdańsk",
-  "Warsaw",
-  "Katowice",
-  "Wroclaw",
-  "Lodz",
-  "Kraków",
-  "Poznań",
-  "Szczecin",
-  "Lublin",
-  "Białystok"
-];
+      const data = await resp.json();
+      if (!Array.isArray(data) || data.length === 0) {
+        resultsDiv.innerHTML = "<p>No offers found.</p>";
+        return;
+      }
 
-const originSel=document.getElementById("origin");
-const destSel=document.getElementById("destination");
-cities.forEach(c=>{
-  originSel.innerHTML += `<option>${c}</option>`;
-  destSel.innerHTML   += `<option>${c}</option>`;
-});
-destSel.value="Warsaw";
+      data.forEach(o => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="card-left">
+            <div class="time-row">
+              <span class="bold">${o.departureTime}</span>
+              <div class="time-line">
+                <div class="date-on-line">${dateInput.value}</div>
+              </div>
+              <span class="bold">${o.arrivalTime}</span>
+              <div class="duration-on-line">
+                ${o.durationHours}:${o.durationMinutes.toString().padStart(2, "0")} hrs
+              </div>
+            </div>
+            <div class="city-row">
+              <span>${o.fromCity}</span>
+              <span>${o.toCity}</span>
+            </div>
+            <div class="id-badge">
+              <strong>BUS</strong>
+              <span class="divider"></span>
+              <span>${o.shortId}</span>
+            </div>
+          </div>
+          <div class="card-right">
+            <div class="price">${o.price} ${o.currency}</div>
+            <div class="seats">Seats: ${o.availableSeats ?? ''}</div>
+            <button class="continue-btn">Continue</button>
+          </div>
+        `;
+        resultsDiv.appendChild(card);
+      });
+    };
+  </script>
 
-// 一周日期
-const dateSel=document.getElementById("date");
-const today=new Date();
-for(let i=0;i<7;i++){
-  const d=new Date(today);
-  d.setDate(today.getDate()+i);
-  const v=d.toISOString().split("T")[0];
-  dateSel.innerHTML+=`<option value="${v}">${v}</option>`;
-}
-
-document.getElementById("searchBtn").onclick=async()=>{
-  document.getElementById("msg").textContent="";
-  document.getElementById("results").innerHTML="";
-  const qs=new URLSearchParams({
-    origin:originSel.value,
-    destination:destSel.value,
-    date:dateSel.value,
-    transport:document.getElementById("transport").value,
-    people:document.getElementById("people").value,
-    promotion:document.getElementById("promotion").checked
-  });
-  try{
-    const r=await fetch(`http://localhost:5035/api/offers/search?${qs}`);
-    if(!r.ok) throw new Error(await r.text());
-    const data=await r.json();
-    render(data);
-  }catch(e){
-    document.getElementById("msg").textContent="❌ "+e.message;
-  }
-};
-
-function render(list){
-  if(!list.length){document.getElementById("results").textContent="No data";return;}
-  const rows=list.map(o=>`
-    <tr>
-      <td>${o.id}</td>
-      <td>${o.departureTime}</td>
-      <td>${o.arrivalTime}</td>
-      <td>${o.price.toFixed(2)} ${o.currency}</td>
-      <td>${o.provider}</td>
-      <td>${o.fromCity}</td>
-      <td>${o.toCity}</td>
-      <td>${o.availableSeats}</td>
-      <td>${o.isPromoted?'Yes':'No'}</td>
-      <td>${o.transport}</td>
-    </tr>`).join(""); <!-- ✅ 这里修改 -->
-  document.getElementById("results").innerHTML=
-    `<table>
-       <tr><th>Id</th><th>Departure</th><th>Arrival</th><th>Price</th>
-           <th>Provider</th><th>From</th><th>To</th><th>Seats</th>
-           <th>Promo</th><th>Type</th></tr>${rows}</table>`;
-}
-</script>
+  <!-- 注入左侧导航 -->
+  <script>
+    fetch('navbar.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('navbar').outerHTML = html;
+        const currentPage = location.pathname.split('/').pop();
+        document.querySelectorAll('.navmenu a').forEach(a => {
+          if (a.getAttribute('href') === currentPage) {
+            a.classList.add('active');
+          }
+        });
+      })
+      .catch(console.error);
+  </script>
 </body>
 </html>

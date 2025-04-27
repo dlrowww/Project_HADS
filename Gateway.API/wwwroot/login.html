@@ -4,12 +4,17 @@
   <meta charset="UTF-8" />
   <title>Login</title>
   <style>
-    body { font-family: sans-serif; padding: 40px; max-width: 400px; margin: auto; }
+    /* —— 原有 body 样式 —— */
+    /* 新增 margin-left:80px; 给左侧导航留出空间 */
+    body { font-family: sans-serif; padding: 40px; max-width: 400px; margin: auto; margin-left: 80px; }
     label, input { display: block; margin-top: 10px; width: 100%; }
     button { margin-top: 20px; width: 100%; padding: 10px; }
   </style>
 </head>
 <body>
+  <!-- 注入左侧导航 -->
+  <div id="navbar"></div>
+
   <h1>Login</h1>
 
   <label>
@@ -58,6 +63,22 @@
       }
     });
   </script>
+
+  <!-- 注入左侧导航脚本 -->
+  <script>
+    fetch('navbar.html')
+      .then(r => r.text())
+      .then(html => {
+        document.getElementById('navbar').innerHTML = html;
+        // 给当前页对应链接加 .active
+        const path = location.pathname.split('/').pop();
+        document.querySelectorAll('.navmenu a').forEach(a => {
+          if (a.getAttribute('href') === path) a.classList.add('active');
+        });
+      })
+      .catch(console.error);
+  </script>
 </body>
 </html>
+
 
