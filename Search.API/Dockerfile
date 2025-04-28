@@ -1,15 +1,21 @@
+# Base image for runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+EXPOSE 5189  
+
+# Build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY . .
+RUN dotnet restore "Search.API/Search.API.csproj"
+RUN dotnet build "Search.API/Search.API.csproj" -c Release -o /app/build
 
-WORKDIR /src/Search.API
-RUN dotnet publish -c Release -o /app/publish
+# Publish stage
+FROM build AS publish
+RUN dotnet publish "Search.API/Search.API.csproj" -c Release -o /app/publish
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+# Final image
+FROM base AS final
 WORKDIR /app
-COPY --from=build /app/publish .
-
-EXPOSE 5078
-ENV ASPNETCORE_URLS=http://+:5078
-
+COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Search.API.dll"]

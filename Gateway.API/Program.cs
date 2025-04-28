@@ -7,18 +7,24 @@ using OfferInventory.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ───── CORS 设置（如果前端运行在外部端口，比如 live-server）─────
 builder.Services.AddCors(opt =>
 {
     opt.AddPolicy("live-server", p =>
-        p.WithOrigins("http://127.0.0.1:5500", "http://localhost:5500")
-         .AllowAnyHeader()
-         .AllowAnyMethod());
+        p.WithOrigins(
+            "http://127.0.0.1:5500",
+            "http://localhost:5500",
+            "http://localhost:5035"      // 添加自己容器网页的来源
+        )
+        .AllowAnyHeader()
+        .AllowAnyMethod());
 });
 
-// ───── HttpClient：指向 Search.API ─────
+// ───── HttpClient：用于反向代理到 Search.API ─────
 builder.Services.AddHttpClient("search", c =>
 {
-    c.BaseAddress = new Uri("http://localhost:5078"); // ← Search.API 实际端口
+    c.BaseAddress = new Uri("http://search:5078");  // Docker 容器内的服务名
     c.Timeout = TimeSpan.FromSeconds(10);
 });
 
@@ -30,19 +36,27 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Gateway.API", Version = "v1" });
 });
 
+// ───── 如果 Gateway 也要连接数据库（可选）─────
+var connectionString = builder.Configuration["ConnectionStrings:DefaultConnection"];
+if (!string.IsNullOrWhiteSpace(connectionString))
+{
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+}
 
-// ───── 如果网关也需要连库（可选）─────
-var connectionString = builder.Configuration["ConnectionStrings:DefaultConnection"]!;
-  builder.Services.AddDbContext<AppDbContext>(options =>
-      options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 var app = builder.Build();
-// ───── 反向代理 ─────
-app.UseStaticFiles(); 
-// ───── 中间件顺序 ─────
+
+// ───── 静态文件服务（允许访问 search.html）─────
+app.UseStaticFiles();
+
+// ───── 中间件顺序非常关键！─────
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseCors("live-server");   // ← 指定上面那条策略
+// ✅ 启用 CORS 策略（必须在 MapControllers 之前）
+app.UseCors("live-server");
+
+app.UseAuthorization();
 app.MapControllers();
 
-app.Run();
+app.Run("http://0.0.0.0:5035");

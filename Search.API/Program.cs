@@ -6,35 +6,33 @@ using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Configuration;
 using System.Net.Http;
 using Microsoft.EntityFrameworkCore;
-using OfferInventory.Infrastructure.Data;  // <-- 现在能识别了！
-using Search.API.Controllers;
+using OfferInventory.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ 精准 CORS 设置：只允许 localhost:5500 的网页访问
+// 修改 CORS 设置：允许 Gateway 页面访问 Search.API
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:5500")  // 确保和前端页面一致
+        policy.WithOrigins("http://localhost:5035")  // Gateway 页面来源
               .AllowAnyMethod()
               .AllowAnyHeader();
     });
 });
 
-// ✅ 注册 HttpClient：用于请求 OfferInventory
+// 注册 HttpClient：Search 调用 OfferInventory
 builder.Services.AddHttpClient("offerInventory", c =>
 {
-    c.BaseAddress = new Uri("http://localhost:5189");  // OfferInventory.API 端口
+    c.BaseAddress = new Uri("http://offerinventory:5189");  // Docker 容器名 + 端口
     c.Timeout = TimeSpan.FromSeconds(10);
 });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// 添加这行：注册 AppDbContext
+// 注册数据库上下文
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
-
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -48,10 +46,11 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// ✅ 必须在 MapControllers 之前调用
+// 注意调用顺序：CORS 必须在 MapControllers 之前
 app.UseCors();
 
 app.UseAuthorization();
 app.MapControllers();
 
-app.Run();
+// 指定监听地址（推荐添加）
+app.Run("http://0.0.0.0:5078");

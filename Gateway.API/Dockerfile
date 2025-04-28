@@ -1,17 +1,21 @@
+# Base image for runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+EXPOSE 5189  
+
+# Build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-
-# 拷贝整个解决方案以包含引用项目
 COPY . .
+RUN dotnet restore "Gateway.API/Gateway.API.csproj"
+RUN dotnet build "Gateway.API/Gateway.API.csproj" -c Release -o /app/build
 
-WORKDIR /src/Gateway.API
-RUN dotnet publish -c Release -o /app/publish
+# Publish stage
+FROM build AS publish
+RUN dotnet publish "Gateway.API/Gateway.API.csproj" -c Release -o /app/publish
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+# Final image
+FROM base AS final
 WORKDIR /app
-COPY --from=build /app/publish .
-
-EXPOSE 5035
-ENV ASPNETCORE_URLS=http://+:5035
-
+COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Gateway.API.dll"]
