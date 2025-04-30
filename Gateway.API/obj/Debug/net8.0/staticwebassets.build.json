@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "pZ1XEqOsKWpWeL3/+y80Ast97Z86hjkWj/kK0j/AihQ=",
+  "Hash": "ATcargAs2G3UTHhIEpFBoDYxs+a+K0nt3ouOqIUILyI=",
   "Source": "Gateway.API",
   "BasePath": "_content/Gateway.API",
   "Mode": "Default",
@@ -53,6 +53,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/green_2.jpg"
+    },
+    {
+      "Identity": "/home/simon/Project_HADS/Gateway.API/wwwroot/green_3.jpg",
+      "SourceId": "Gateway.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/simon/Project_HADS/Gateway.API/wwwroot/",
+      "BasePath": "_content/Gateway.API",
+      "RelativePath": "green_3.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/green_3.jpg"
     },
     {
       "Identity": "/home/simon/Project_HADS/Gateway.API/wwwroot/green.jpg",

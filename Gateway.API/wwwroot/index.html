@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <style>
+     * { box-sizing: border-box; } 
     html, body {
       margin: 0;
       padding: 0;
@@ -15,8 +16,8 @@
 
     body {
       background: url('green_3.jpg') no-repeat center center;
-      background-size: cover; /* ✅ 图片铺满屏幕，保持比例 */
-      background-attachment: fixed; /* ✅ 页面滚动时背景不动（可选） */
+      background-size: cover; /* 图片铺满屏幕，保持比例 */
+      background-attachment: fixed; /* 页面滚动时背景不动（可选） */
       display: flex;
       justify-content: flex-start;     /* 左对齐 */
       align-items: center;             /* 垂直居中 */
@@ -42,13 +43,13 @@
     }
 
     .bus-image {
-      position: fixed;     /* ✅ 固定位置 */
-      bottom: -40px;         /* ✅ 距离底部 20px */
-      right: 20px;          /* ✅ 距离右侧 20px */
+      position: fixed;     /* 固定位置 */
+      bottom: -40px;         /* 距离底部 20px */
+      right: 20px;          /* 距离右侧 20px */
       width: 300px;
       height: auto;
       opacity: 0.95;
-      z-index: 10;          /* ✅ 确保它不被背景遮住 */
+      z-index: 10;          /* 确保它不被背景遮住 */
     }
   </style>
 </head>
@@ -56,12 +57,18 @@
 
   <div id="navbar"></div>
   <script>
-    // 动态加载 navbar.html 到页面中
     fetch('navbar.html')
       .then(res => res.text())
       .then(html => {
-        document.getElementById('navbar').innerHTML = html;
-      });
+        document.getElementById('navbar').outerHTML = html;
+        const currentPage = location.pathname.split('/').pop();
+        document.querySelectorAll('.navmenu a').forEach(a => {
+          if (a.getAttribute('href') === currentPage) {
+            a.classList.add('active');
+          }
+        });
+      })
+      .catch(console.error);
   </script>
 
   <div class="content">

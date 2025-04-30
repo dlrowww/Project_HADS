@@ -11,14 +11,24 @@
       padding: 0;
       font-family: 'Segoe UI', sans-serif;
       background: #eeeeee;
+      /* 新增：给左侧导航留出空间 */
+      margin-left: 80px;
+      height: 100%;
+    }
+    .main-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
     }
 
     /* —— header —— */
     .header {
-      background-color: #2def47;
+      background-color: #42e315;
       color: white;
       text-align: center;
       padding: 30px 20px;
+      margin-left: -170px;
+      width: calc(100% + 180px);
     }
     .header h1 { margin: 0; font-size: 32px; }
 
@@ -26,6 +36,8 @@
     .controls-section {
       background: #ffffff;
       padding: 20px;
+      margin-left: -170px;
+      width: calc(100% + 180px);
     }
     .controls-container {
       display: grid;
@@ -76,6 +88,7 @@
     .results-section {
       background: #eeeeee;
       padding: 20px;
+      margin-left: -140px;
     }
     .results-section h2 {
       margin: 0 0 15px 0;
@@ -142,7 +155,7 @@
       position: absolute;
       top: 12px;        /* 刚好在线下方 */
       left: 50%;
-      transform: translateX(-230%);
+      transform: translateX(-210%);
       font-size: 13px;
       color: #555;
       white-space: nowrap;
@@ -206,6 +219,9 @@
   </style>
 </head>
 <body>
+  <!-- 注入左侧导航 -->
+  <div id="navbar"></div>
+
   <div class="header">
     <h1>BusCrawler</h1>
   </div>
@@ -329,6 +345,22 @@
         resultsDiv.appendChild(card);
       });
     };
+  </script>
+
+  <!-- 注入左侧导航 -->
+  <script>
+    fetch('navbar.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('navbar').outerHTML = html;
+        const currentPage = location.pathname.split('/').pop();
+        document.querySelectorAll('.navmenu a').forEach(a => {
+          if (a.getAttribute('href') === currentPage) {
+            a.classList.add('active');
+          }
+        });
+      })
+      .catch(console.error);
   </script>
 </body>
 </html>

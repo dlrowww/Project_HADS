@@ -1,0 +1,123 @@
+<!-- navbar.html  -->
+<!-- 左侧圆形图标导航（与 BootstrapMade 原版样式一致） -->
+<link rel="stylesheet" href="assets/vendor/bootstrap-icons/bootstrap-icons.css" />
+
+<style>
+  /* —— 变量 —— */
+  :root{
+    --background-color:#fff;
+    --default-color:#272829;
+    --accent-color:#0563bb;
+    --contrast-color:#ffffff;
+
+    --nav-color:#45505b;
+    --nav-hover-color:#398e21;
+
+    --nav-font: "Poppins", sans-serif;
+  }
+
+  /* —— 容器 header —— */
+  .sidebar{
+    color:var(--default-color);
+    position:fixed;top:0;left:0;bottom:0;
+    padding:0 15px;
+    overflow-y:auto;
+    z-index:997;
+    min-width:200px;
+    transition:all .3s ease-in-out;
+    display: flex;                /* 设置为 flex */
+  flex-direction: column;      /* 垂直排列按钮 */
+  justify-content: center;     /* 垂直方向居中 */
+  align-items: flex-start;  
+  }
+  @media(max-width:1199px){
+    .sidebar{background:var(--background-color);border-right:1px solid rgba(0,0,0,.08);width:300px;left:-100%;}
+    .sidebar.sidebar-show{left:0;}
+  }
+
+  /* —— mobile 汉堡按钮 —— */
+  .sidebar-toggle{
+    position:fixed;top:15px;right:15px;
+    display:flex;align-items:center;justify-content:center;
+    width:40px;height:40px;
+    font-size:22px;cursor:pointer;
+    color:var(--contrast-color);background:var(--accent-color);
+    border-radius:50%;z-index:9999;transition:background .3s;
+    display: none
+  }
+  .sidebar-toggle:hover{background:#1b9337;}
+
+  /* —— 列表 —— */
+  .navmenu ul{list-style:none;padding:0 0 20px 0;margin:0;width:140px;}
+
+  .navmenu a{
+    display:flex;align-items:center;gap:7px;
+    padding:10px 18px;margin-bottom:8px;height:56px;width:100%;
+    font:15px var(--nav-font);color:var(--nav-color);
+    background:rgba(0,0,0,.04);border-radius:50px;overflow:hidden;
+    transition:.3s;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    width:auto;               /* 固定 */
+  }
+  .navmenu a i{font-size:20px;}
+  @media(min-width:992px){
+    .navmenu a{max-width:56px;}
+    .navmenu a span{display:none;}
+  }
+
+  /* —— hover / active —— */
+  .navmenu a:hover,
+  .navmenu .active{
+    color:var(--contrast-color);background:var(--nav-hover-color);
+  }
+  .navmenu a:hover{max-width:100%;}
+  .navmenu a:hover span{display:block;}
+</style>
+
+<header id="sidebar" class="sidebar d-flex flex-column justify-content-center">
+  <i class="sidebar-toggle bi bi-list d-xl-none"></i>
+
+  <nav id="navmenu" class="navmenu">
+    <ul>
+      <li><a href="index.html"><i class="bi bi-house"></i><span>Home</span></a></li>
+      <li><a href="login.html"><i class="bi bi-person"></i><span>User</span></a></li>
+      <li><a href="search.html"><i class="bi bi-bus-front-fill"></i><span>Bus</span></a></li>
+      <li><a href="portfolio.html"><i class="bi bi-airplane"></i><span>Airplane</span></a></li>
+      <li><a href="services.html"><i class="bi bi-train-front"></i><span>Train</span></a></li>
+      <li><a href="contact.html"><i class="bi bi-envelope"></i><span>Contact</span></a></li>
+    </ul>
+  </nav>
+</header>
+
+<script>
+/* ——— 导航交互 ——— */
+(() => {
+  const header  = document.getElementById('sidebar');
+  const toggle  = header.querySelector('.sidebar-toggle');
+  const links   = header.querySelectorAll('#navmenu a');
+
+  /* 展开 / 折叠（移动端） */
+  const toggleHeader = () => {
+    header.classList.toggle('sidebar-show');
+    toggle.classList.toggle('bi-list');
+    toggle.classList.toggle('bi-x');
+  };
+  toggle.addEventListener('click', toggleHeader);
+
+  /* 点链接自动收起（移动端） */
+  links.forEach(a=>{
+    a.addEventListener('click',()=>{
+      if (header.classList.contains('sidebar-show')) toggleHeader();
+    });
+  });
+
+  /* 根据当前文件名高亮 */
+  const page = location.pathname.split('/').pop() || 'search.html';
+  links.forEach(a=>{
+    if(a.getAttribute('href') === page) a.classList.add('active');
+  });
+})();
+</script>
+

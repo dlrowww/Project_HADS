@@ -257,7 +257,20 @@
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>
-    const cities = ["Gdańsk","Warsaw","Katowice","Wrocław","Łódź","Kraków","Poznań","Szczecin","Lublin","Białystok"];
+    const cities = [
+  "Gdańsk", "Warsaw", "Katowice", "Wrocław", "Łódź", "Kraków", "Poznań", "Szczecin",
+  "Lublin", "Białystok", "Prague", "Brno", "Ostrava", "Plzeň", "Liberec", "Olomouc",
+  "České Budějovice", "Hradec Králové", "Berlin", "Hamburg", "Munich", "Koeln",
+  "Frankfurt am Main", "Essen", "Stuttgart", "Dortmund", "Duesseldorf", "Bremen",
+  "Hannover", "Leipzig", "Duisburg", "Nuernberg", "Dresden", "Bochum", "Wuppertal",
+  "Bielefeld", "Bonn", "Mannheim", "Karlsruhe", "Wiesbaden", "Muenster",
+  "Gelsenkirchen", "Aachen", "Moenchengladbach", "Augsburg", "Chemnitz",
+  "Braunschweig", "Krefeld", "Halle", "Kiel", "Magdeburg", "Neue Neustadt",
+  "Oberhausen", "Freiburg", "Luebeck", "Erfurt", "Hagen", "Rostock", "Kassel",
+  "Mainz", "Saarbruecken", "Herne", "Muelheim", "Osnabrueck", "Oldenburg",
+  "Potsdam", "Darmstadt", "Wuerzburg", "Regensburg", "Wolfsburg", "Ingolstadt",
+  "Ulm", "Trier", "Worms"
+];
     const originSel = document.getElementById("origin");
     const destSel   = document.getElementById("destination");
     cities.forEach(c => {
@@ -274,7 +287,7 @@
       dateFormat: "Y-m-d",
       defaultDate: today,
       minDate: today,
-      maxDate: new Date().fp_incr(6),
+      maxDate: new Date().fp_incr(30),
       showMonths: 2,
       allowInput: false
     });

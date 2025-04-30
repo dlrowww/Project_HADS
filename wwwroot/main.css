@@ -1,0 +1,256 @@
+/* ========== 全局 ========== */
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #ffffff;
+  margin-left: 80px;           /* 为 80 px 侧栏留出空间 */
+}
+
+/* ========== header ========== */
+.header {
+  background-color: #42e315;
+  color: #ffffff;
+  text-align: center;
+  padding: 30px 20px;
+
+  /* 拉满整屏（覆盖 margin-left 80） */
+  margin-left: -80px;
+  width: calc(100% + 80px);
+}
+.header h1 {
+  margin: 0;
+  font-size: 32px;
+}
+
+/* ========== controls ========== */
+.controls-section {
+  background: #ffffff;
+  padding: 20px;
+
+  /* 同理拉满整屏 */
+  margin-left: -80px;
+  width: calc(100% + 80px);
+}
+.controls-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 15px;
+  max-width: 1000px;
+  margin: auto;
+}
+label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+}
+select,
+input[type="number"],
+input#date {
+  margin-top: 6px;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+}
+.controls-container > button {
+  grid-column: 3;
+  grid-row: 2;
+  width: 100%;
+}
+button {
+  background: #0fb346;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 18px;
+  font-size: 16px;
+  cursor: pointer;
+  grid-column: span 2;
+}
+button:hover { background: #277517; }
+.err {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* ========== results ========== */
+.results-section {
+  background: #ffffff;
+  padding: 20px;
+
+  /* search.html 原本 -40px；保持不变即可 */
+  margin-left: -40px;
+}
+.results-section h2 {
+  margin: 0 0 15px 0;
+  font-size: 24px;
+  display: none;
+}
+.results-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 860px;
+  margin: auto;
+}
+#resultsTitle {
+  align-self: flex-start;
+  margin: 0 0 15px 0;
+}
+
+/* ========== offer card ========== */
+.card {
+  display: flex;
+  justify-content: space-between;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  padding: 16px 24px;
+  width: 90%;
+}
+.card-left { flex: 1; display: flex; flex-direction: column; }
+.time-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 75px 0.66fr 90px;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 700;
+}
+.time-line {
+  grid-column: 2;
+  width: 100%;
+  height: 1px;
+  background: #ccc;
+  position: relative;
+}
+.date-on-line {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 13px;
+  color: #777;
+  margin: 0;
+  text-align: center;
+}
+.duration-on-line {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-210%);
+  font-size: 13px;
+  color: #555;
+  white-space: nowrap;
+}
+.city-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 15px;
+  color: #666;
+}
+.id-badge {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: #999;
+}
+.id-badge .divider {
+  height: 14px;
+  width: 1px;
+  background: #ccc;
+  margin: 0 8px;
+}
+.card-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.price {
+  font-size: 20px;
+  font-weight: bold;
+  color: #0a971f;
+}
+.seats { font-size: 14px; color: #777; }
+.continue-btn {
+  background: #0563bb;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.continue-btn:hover { background: #034a94; }
+
+/* ========== index.html (homepage) ========== */
+.homepage {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Poppins', sans-serif;
+  background: url('green_3.jpg') no-repeat center center;
+  background-size: cover;
+  background-attachment: fixed;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding-left: 8vw;
+  color: #2c2c2c;
+
+  margin-left: 80px;           /* 与侧栏对齐 */
+}
+.homepage .content {
+  max-width: 600px;
+  background: transparent;
+  padding: 30px 40px;
+  border-radius: 20px;
+}
+.homepage h1 {
+  font-size: 48px;
+  margin: 100px 0 10px 0;
+}
+.homepage p {
+  font-size: 22px;
+  margin: 0;
+}
+.homepage .bus-image {
+  position: fixed;
+  bottom: -40px;
+  right: 20px;
+  width: 300px;
+  height: auto;
+  opacity: 0.95;
+  z-index: 10;
+}
+
+/* ========== 统一侧栏 (80 px) ========== */
+.sidebar{
+  width: 80px !important;
+  min-width: 80px !important;
+  padding: 0 !important;          /* 去掉原 15 px 内边距 */
+}
+
+.navmenu ul{
+  width: 100% !important;
+}
+
+.navmenu a{
+  max-width: 100% !important;     /* 保持完整宽度 */
+  width: 100% !important;
+}
+
+.navmenu a span{
+  display: block !important;      /* 任意分辨率都显示文字 */
+}

@@ -13,6 +13,10 @@
       "PackagePath": "staticwebassets/green_2.jpg"
     },
     {
+      "Id": "/home/simon/Project_HADS/Gateway.API/wwwroot/green_3.jpg",
+      "PackagePath": "staticwebassets/green_3.jpg"
+    },
+    {
       "Id": "/home/simon/Project_HADS/Gateway.API/wwwroot/index.html",
       "PackagePath": "staticwebassets/index.html"
     },
