@@ -1,9 +1,15 @@
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Booking.API.Hubs
 {
+    [Authorize]
     public class BookingStatusHub : Hub
     {
-        // 这里目前不需要额外方法，直接用 Clients.All.SendAsync 即可
+        public Task JoinOffer(Guid offerId) =>
+            Groups.AddToGroupAsync(Context.ConnectionId, $"offer:{offerId}");
+
+        public Task LeaveOffer(Guid offerId) =>
+            Groups.RemoveFromGroupAsync(Context.ConnectionId, $"offer:{offerId}");
     }
 }

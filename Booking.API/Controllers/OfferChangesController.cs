@@ -6,11 +6,13 @@ using Booking.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Booking.API.Controllers
 {
     [ApiController]
     [Route("api/offers/{offerId:guid}/changes")]
+    [Authorize]
     public class OfferChangesController : ControllerBase
     {
         private readonly BookingDbContext _db;

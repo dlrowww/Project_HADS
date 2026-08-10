@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using System;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace Gateway.API.Controllers;
@@ -47,6 +48,7 @@ public class AuthController : ControllerBase
     }
     // ---------- 获取用户信息 ----------
     [HttpGet("info")]
+    [Authorize]
     public async Task<IActionResult> Info()
     {
         var client = _factory.CreateClient("user");

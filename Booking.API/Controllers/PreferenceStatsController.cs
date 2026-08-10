@@ -1,11 +1,13 @@
 using Booking.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Booking.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class PreferenceStatsController : ControllerBase
 {
     private readonly BookingDbContext _db;
@@ -29,4 +31,3 @@ public class PreferenceStatsController : ControllerBase
         return Ok(topStats);
     }
 }
-

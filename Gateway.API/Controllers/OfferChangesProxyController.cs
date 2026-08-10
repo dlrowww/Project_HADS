@@ -4,11 +4,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
+using System.Net.Http.Headers;
 
 namespace Gateway.API.Controllers
 {
     [ApiController]
     [Route("api/offers/{offerId:guid}/changes")]
+    [Authorize]
     public class OfferChangesProxyController : ControllerBase
     {
         private readonly HttpClient _booking;
@@ -37,7 +40,10 @@ namespace Gateway.API.Controllers
             _logger.LogInformation("[Gateway.API] Proxying request for OfferId: {OfferId}", offerId);
             Console.WriteLine($"[Gateway.API] Proxy GET /api/offers/{offerId}/changes/recent");
 
-            var resp = await _booking.GetAsync($"/api/offers/{offerId}/changes/recent");
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"/api/offers/{offerId}/changes/recent");
+            if (Request.Headers.TryGetValue("Authorization", out var authorization))
+                request.Headers.Authorization = AuthenticationHeaderValue.Parse(authorization.ToString());
+            var resp = await _booking.SendAsync(request);
             _logger.LogInformation("[Gateway.API] Received status code {StatusCode} from Booking API", resp.StatusCode);
             Console.WriteLine($"[Gateway.API] Response status: {(int)resp.StatusCode}");
 

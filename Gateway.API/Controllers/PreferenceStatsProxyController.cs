@@ -2,11 +2,14 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
+using System.Net.Http.Headers;
 
 namespace Gateway.API.Controllers
 {
     [ApiController]
     [Route("api/preferencestats")]
+    [Authorize]
     public class PreferenceStatsProxyController : ControllerBase
     {
         private readonly IHttpClientFactory _httpFactory;
@@ -36,7 +39,10 @@ namespace Gateway.API.Controllers
 
             // 发起请求
             var client = _httpFactory.CreateClient();
-            var resp   = await client.GetAsync(url);
+            using var request = new HttpRequestMessage(HttpMethod.Get, url);
+            if (Request.Headers.TryGetValue("Authorization", out var authorization))
+                request.Headers.Authorization = AuthenticationHeaderValue.Parse(authorization.ToString());
+            var resp = await client.SendAsync(request);
 
             // 顺序读取并转发状态码与内容
             var json = await resp.Content.ReadAsStringAsync();
@@ -49,4 +55,3 @@ namespace Gateway.API.Controllers
         }
     }
 }
-

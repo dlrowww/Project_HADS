@@ -161,7 +161,7 @@
         const ul = document.getElementById("live-updates");
         const li = document.createElement("li");
         li.className = "list-group-item py-1";
-        li.textContent = `${data.Time} — ${data.Customer} buy Offer ${data.OfferId}（Booking ${data.BookingId}）`;
+        li.textContent = `${new Date(data.time).toLocaleTimeString()} — ${data.numberOfSeats} seat(s) booked`;
         ul.insertBefore(li, ul.firstChild);
       });
 
