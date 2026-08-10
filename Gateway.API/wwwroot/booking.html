@@ -138,13 +138,17 @@
         },
         body: JSON.stringify(booking),
       })
-      .then(res => {
-        if (!res.ok) throw new Error("Booking failed");
-        return res.json();
+      .then(async res => {
+        const body = await res.json().catch(() => null);
+        if (!res.ok) {
+          const message = body?.error || body?.message || `Booking failed (HTTP ${res.status})`;
+          throw new Error(message);
+        }
+        return body;
       })
       .then(data => {
         localStorage.setItem("bookingId", data.bookingId);
-        window.location.href = "history.html";
+        window.location.href = "history.html?v=20260810";
       })
       .catch(err => alert(err.message));
     });

@@ -1,142 +1,158 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using OfferInventory.Infrastructure.Data;
 
-namespace OfferInventory.Application.Services
+namespace OfferInventory.Application.Services;
+
+/// <summary>
+/// Periodically refreshes FlixBus offers for the configured cities.
+/// </summary>
+public sealed class FlixbusBatchCrawler : BackgroundService
 {
-    /// <summary>
-    /// 后台任务：批量爬取 7天 × N × (N-1) 城市组合数据
-    /// 注册为 HostedService，随 ASP.NET Core 启动自动运行
-    /// </summary>
-    public sealed class FlixbusBatchCrawler : BackgroundService
+    private static readonly string[] DefaultCityIds =
     {
-        private readonly IServiceScopeFactory _scopeFactory;
-        private readonly ILogger<FlixbusBatchCrawler> _log;
+        "40e19c59-8646-11e6-9066-549f350fcb0c", // Warsaw
+        "40de6982-8646-11e6-9066-549f350fcb0c"  // Gdansk
+    };
 
-        public FlixbusBatchCrawler(
-            IServiceScopeFactory scopeFactory,
-            ILogger<FlixbusBatchCrawler> log)
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly ILogger<FlixbusBatchCrawler> _log;
+    private readonly IConfiguration _configuration;
+
+    public FlixbusBatchCrawler(
+        IServiceScopeFactory scopeFactory,
+        ILogger<FlixbusBatchCrawler> log,
+        IConfiguration configuration)
+    {
+        _scopeFactory = scopeFactory;
+        _log = log;
+        _configuration = configuration;
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        if (!_configuration.GetValue("FlixbusCrawler:Enabled", true))
         {
-            _scopeFactory = scopeFactory;
-            _log = log;
+            _log.LogInformation("FlixBus background crawler is disabled.");
+            return;
         }
 
-        private static readonly string[] _cityIds =
-        {
-            /*"40e19c59-8646-11e6-9066-549f350fcb0c", // Warsaw
-            "40de6982-8646-11e6-9066-549f350fcb0c", // Gdańsk
-            "40de7b94-8646-11e6-9066-549f350fcb0c", // Katowice
-            "40de575f-8646-11e6-9066-549f350fcb0c", // Wroclaw
-            "40e19dd6-8646-11e6-9066-549f350fcb0c", // Lodz
-            "40de7eb5-8646-11e6-9066-549f350fcb0c", // Kraków
-            "40de8b67-8646-11e6-9066-549f350fcb0c", // Poznań
-            "40de9afa-8646-11e6-9066-549f350fcb0c", // Szczecin
-            "d7687a0f-488f-49c7-821e-5a26640c5f86", // Lublin
-            "b5b11801-0928-43c1-af2e-2f01acbc0eca", // Białystok
-            "40de6094-8646-11e6-9066-549f350fcb0c", // "Bydgoszcz"
-            "40de1ad1-8646-11e6-9066-549f350fcb0c",// "Prague",
-            "40e1a0af-8646-11e6-9066-549f350fcb0c",// = "Brno",
-            "40e0eb79-8646-11e6-9066-549f350fcb0c",// = "Ostrava",
-            "40de8a5a-8646-11e6-9066-549f350fcb0c",// = "Plzeň",
-            "40e2a266-8646-11e6-9066-549f350fcb0c",// = "Liberec",
-            "40de8a5a-8646-11e6-9066-549f350fcb0c",// = "Olomouc",
-            "40de6751-8646-11e6-9066-549f350fcb0c",// = "České Budějovice",
-            "40e0c29f-8646-11e6-9066-549f350fcb0c",// = "Hradec Králové",
-            "40d8f682-8646-11e6-9066-549f350fcb0c",// = "Berlin",
-            "40d91e53-8646-11e6-9066-549f350fcb0c",// = "Hamburg",
-            "40d901a5-8646-11e6-9066-549f350fcb0c",// = "Munich",
-            "40d91025-8646-11e6-9066-549f350fcb0c",// = "Koeln",
-            "40d90407-8646-11e6-9066-549f350fcb0c",// = "Frankfurt am Main",
-            "40da3d5e-8646-11e6-9066-549f350fcb0c",// = "Essen",
-            "40d90995-8646-11e6-9066-549f350fcb0c",// = "Stuttgart",
-            "40da382b-8646-11e6-9066-549f350fcb0c",// = "Dortmund",
-            "40d911c7-8646-11e6-9066-549f350fcb0c",// = "Duesseldorf",
-            "40da6e70-8646-11e6-9066-549f350fcb0c",// = "Bremen",
-            "40da4ac8-8646-11e6-9066-549f350fcb0c",// = "Hannover",
-            "40d917f9-8646-11e6-9066-549f350fcb0c",// = "Leipzig",
-            "40da79b3-8646-11e6-9066-549f350fcb0c",// = "Duisburg",
-            "40d90d0f-8646-11e6-9066-549f350fcb0c",// = "Nuernberg",
-            "40db219f-8646-11e6-9066-549f350fcb0c",// = "Dresden",
-            "40da3a44-8646-11e6-9066-549f350fcb0c",// = "Bochum",
-            "40da70aa-8646-11e6-9066-549f350fcb0c",// = "Wuppertal",
-            "40dad33a-8646-11e6-9066-549f350fcb0c",// = "Bielefeld",
-            "40dadbff-8646-11e6-9066-549f350fcb0c",// = "Bonn",
-            "40d90c3a-8646-11e6-9066-549f350fcb0c",// = "Mannheim",
-            "40d912c2-8646-11e6-9066-549f350fcb0c",// = "Karlsruhe",
-            "40dd4112-8646-11e6-9066-549f350fcb0c",// = "Wiesbaden",
-            "40dc47e2-8646-11e6-9066-549f350fcb0c",// = "Muenster",
-            "40ddc67e-8646-11e6-9066-549f350fcb0c",// = "Gelsenkirchen",
-            "40da8ddc-8646-11e6-9066-549f350fcb0c",// = "Aachen",
-            "40da838e-8646-11e6-9066-549f350fcb0c",// = "Moenchengladbach",
-            "40da3fd1-8646-11e6-9066-549f350fcb0c",// = "Augsburg",
-            "40da6fab-8646-11e6-9066-549f350fcb0c",// = "Chemnitz",
-            "40d928aa-8646-11e6-9066-549f350fcb0c",// = "Braunschweig",
-            "40dbe90d-8646-11e6-9066-549f350fcb0c",// = "Krefeld",
-            "40da5768-8646-11e6-9066-549f350fcb0c",// = "Halle",
-            "40dbe253-8646-11e6-9066-549f350fcb0c",// = "Kiel",
-            "40da54cb-8646-11e6-9066-549f350fcb0c",// = "Magdeburg",
-            "40d902e6-8646-11e6-9066-549f350fcb0c",// = "Neue Neustadt",
-            "40da7d07-8646-11e6-9066-549f350fcb0c",// = "Oberhausen",
-            "40d8ff3b-8646-11e6-9066-549f350fcb0c",// = "Freiburg",
-            "40dc0389-8646-11e6-9066-549f350fcb0c",// = "Luebeck",
-            "40db4593-8646-11e6-9066-549f350fcb0c",// = "Erfurt",
-            "40db8000-8646-11e6-9066-549f350fcb0c",// = "Hagen",
-            "40da4248-8646-11e6-9066-549f350fcb0c",// = "Rostock",
-            "40dbdcd2-8646-11e6-9066-549f350fcb0c",// = "Kassel",
-            "40dc0e9e-8646-11e6-9066-549f350fcb0c",// = "Mainz",
-            "40dcbfdd-8646-11e6-9066-549f350fcb0c",// = "Saarbruecken",
-            "40dba27d-8646-11e6-9066-549f350fcb0c",// = "Herne",
-            "40dc4560-8646-11e6-9066-549f350fcb0c",// = "Muelheim",
-            "40dc63d2-8646-11e6-9066-549f350fcb0c",// = "Osnabrueck",
-            "40da6d2c-8646-11e6-9066-549f350fcb0c",// = "Oldenburg",
-            "40dc7203-8646-11e6-9066-549f350fcb0c",// = "Potsdam",
-            "40d90575-8646-11e6-9066-549f350fcb0c",// = "Darmstadt",
-            "40d915ac-8646-11e6-9066-549f350fcb0c",// = "Wuerzburg",
-            "40dc7b76-8646-11e6-9066-549f350fcb0c",// = "Regensburg",
-            "40dd5460-8646-11e6-9066-549f350fcb0c",// = "Wolfsburg",
-            "40dbd358-8646-11e6-9066-549f350fcb0c",// = "Ingolstadt",
-            "40dd1618-8646-11e6-9066-549f350fcb0c",// = "Ulm",
-            "40da743c-8646-11e6-9066-549f350fcb0c",// = "Trier",
-            "40d92538-8646-11e6-9066-549f350fcb0c"// = "Worms",*/
-        };
+        var cityIds = _configuration
+            .GetSection("FlixbusCrawler:CityIds")
+            .Get<string[]>()?
+            .Where(id => !string.IsNullOrWhiteSpace(id))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            var routes =
-                from fromId in _cityIds
-                from toId   in _cityIds
-                where fromId != toId
-                select (fromId, toId);
+        if (cityIds is not { Length: >= 2 })
+            cityIds = DefaultCityIds;
 
-            foreach (var (fromId, toId) in routes)
+        var daysAhead = Math.Clamp(
+            _configuration.GetValue("FlixbusCrawler:DaysAhead", 7), 1, 31);
+        var refreshHours = Math.Max(
+            _configuration.GetValue("FlixbusCrawler:RefreshHours", 12), 1);
+        var retainPastDays = Math.Clamp(
+            _configuration.GetValue("FlixbusCrawler:RetainPastDays", 1), 0, 30);
+        var maxStoredOffers = Math.Clamp(
+            _configuration.GetValue("FlixbusCrawler:MaxStoredOffers", 5000), 100, 100000);
+
+        // Let migrations finish and the application start before making external calls.
+        await Task.Delay(TimeSpan.FromSeconds(3), stoppingToken);
+
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            await CleanupAsync(daysAhead, retainPastDays, maxStoredOffers, stoppingToken);
+            await CrawlAllAsync(cityIds, daysAhead, stoppingToken);
+            await CleanupAsync(daysAhead, retainPastDays, maxStoredOffers, stoppingToken);
+            await Task.Delay(TimeSpan.FromHours(refreshHours), stoppingToken);
+        }
+    }
+
+    private async Task CleanupAsync(
+        int daysAhead,
+        int retainPastDays,
+        int maxStoredOffers,
+        CancellationToken stoppingToken)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var earliest = today.AddDays(-retainPastDays);
+        var latest = today.AddDays(daysAhead - 1);
+
+        var outsideWindow = await db.TransportOffers
+            .Where(offer => offer.DepartureDate < earliest || offer.DepartureDate > latest)
+            .ExecuteDeleteAsync(stoppingToken);
+
+        var total = await db.TransportOffers.CountAsync(stoppingToken);
+        var overflow = Math.Max(0, total - maxStoredOffers);
+        var capped = 0;
+        if (overflow > 0)
+        {
+            var ids = await db.TransportOffers
+                .OrderBy(offer => offer.DepartureDate)
+                .ThenBy(offer => offer.DepartureTime)
+                .Select(offer => offer.Id)
+                .Take(overflow)
+                .ToListAsync(stoppingToken);
+
+            capped = await db.TransportOffers
+                .Where(offer => ids.Contains(offer.Id))
+                .ExecuteDeleteAsync(stoppingToken);
+        }
+
+        if (outsideWindow + capped > 0)
+        {
+            _log.LogInformation(
+                "FlixBus retention cleanup deleted {OutsideWindow} out-of-window and {Capped} over-limit offers.",
+                outsideWindow, capped);
+        }
+    }
+
+    private async Task CrawlAllAsync(
+        IReadOnlyCollection<string> cityIds,
+        int daysAhead,
+        CancellationToken stoppingToken)
+    {
+        var inserted = 0;
+        var failed = 0;
+
+        foreach (var fromId in cityIds)
+        foreach (var toId in cityIds)
+        {
+            if (string.Equals(fromId, toId, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            for (var offset = 0; offset < daysAhead; offset++)
             {
-                for (var offset = 0; offset < 31; offset++)
+                stoppingToken.ThrowIfCancellationRequested();
+                var date = DateTime.UtcNow.Date.AddDays(offset);
+
+                try
                 {
-                    var date = DateTime.Today.AddDays(offset);
-                    if (stoppingToken.IsCancellationRequested)
-                        return;
-
-                    _log.LogInformation("Crawling {Date} {From} ➜ {To}",
-                        date.ToString("yyyy-MM-dd"),
-                        fromId[..8], toId[..8]);
-
-                    try
-                    {
-                        using var scope = _scopeFactory.CreateScope();
-                        var crawler = scope.ServiceProvider.GetRequiredService<FlixbusCrawler>();
-                        await crawler.CrawlAsync(fromId, toId, date);
-                    }
-                    catch (Exception ex)
-                    {
-                        _log.LogWarning(ex, "Crawl failed: {From} ➜ {To}", fromId[..8], toId[..8]);
-                    }
+                    using var scope = _scopeFactory.CreateScope();
+                    var crawler = scope.ServiceProvider.GetRequiredService<FlixbusCrawler>();
+                    inserted += await crawler.CrawlAsync(fromId, toId, date);
+                }
+                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    failed++;
+                    _log.LogWarning(ex,
+                        "FlixBus crawl failed for {Date}, {From} -> {To}",
+                        date.ToString("yyyy-MM-dd"), fromId, toId);
                 }
             }
         }
+
+        _log.LogInformation(
+            "FlixBus refresh completed: {Inserted} offers inserted, {Failed} requests failed.",
+            inserted, failed);
     }
 }
-

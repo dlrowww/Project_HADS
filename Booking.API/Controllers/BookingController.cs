@@ -77,12 +77,15 @@ public class BookingController : ControllerBase
         {
             booking.BookingId,
             booking.UserId,
-            booking.Status,
+            Status = booking.Status.ToString(),
             booking.CreatedAt,
             booking.PaidAt,
             booking.LockId,
             booking.OfferId,
-            booking.NumberOfSeats
+            booking.NumberOfSeats,
+            booking.CustomerName,
+            booking.TotalPrice,
+            booking.Currency
         });
     }
 }

@@ -31,31 +31,35 @@ public class AvailabilityController : ControllerBase
                 ? Ok(new { existing.LockId })
                 : Conflict(new { error = "This booking's seat lock has already been released." });
 
-        await using var transaction = await _db.Database.BeginTransactionAsync();
-        var affected = await _db.Database.ExecuteSqlInterpolatedAsync($@"
-            UPDATE offer_inventory.TransportOffers
-            SET SeatsAvailable = SeatsAvailable - {req.NumberOfSeats}
-            WHERE Id = {req.OfferId} AND SeatsAvailable >= {req.NumberOfSeats}");
-
-        if (affected != 1)
+        var strategy = _db.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync<IActionResult>(async () =>
         {
-            await transaction.RollbackAsync();
-            return Conflict(new { error = "Offer does not exist or has insufficient seats." });
-        }
+            await using var transaction = await _db.Database.BeginTransactionAsync();
+            var affected = await _db.Database.ExecuteSqlInterpolatedAsync($@"
+                UPDATE offer_inventory.TransportOffers
+                SET SeatsAvailable = SeatsAvailable - {req.NumberOfSeats}
+                WHERE Id = {req.OfferId} AND SeatsAvailable >= {req.NumberOfSeats}");
 
-        var seatLock = SeatLock.Create(
-            req.BookingId,
-            req.OfferId,
-            req.UserId,
-            req.NumberOfSeats,
-            TimeSpan.FromMinutes(15)
-        );
+            if (affected != 1)
+            {
+                await transaction.RollbackAsync();
+                return Conflict(new { error = "Offer does not exist or has insufficient seats." });
+            }
 
-        _db.SeatLocks.Add(seatLock);
-        await _db.SaveChangesAsync();
-        await transaction.CommitAsync();
+            var seatLock = SeatLock.Create(
+                req.BookingId,
+                req.OfferId,
+                req.UserId,
+                req.NumberOfSeats,
+                TimeSpan.FromMinutes(15)
+            );
 
-        return Ok(new { LockId = seatLock.LockId });
+            _db.SeatLocks.Add(seatLock);
+            await _db.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return Ok(new { LockId = seatLock.LockId });
+        });
     }
     
     [HttpPost("release/{lockId:guid}")]
@@ -64,24 +68,28 @@ public class AvailabilityController : ControllerBase
         var lockEntity = await _db.SeatLocks.FindAsync(lockId);
         if (lockEntity is null) return NotFound();
 
-        await using var transaction = await _db.Database.BeginTransactionAsync();
-        var released = await _db.Database.ExecuteSqlInterpolatedAsync($@"
-            UPDATE SeatLocks SET Status = 'Released'
-            WHERE LockId = {lockId} AND Status = 'Locked'");
-        if (released == 0)
+        var strategy = _db.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync<IActionResult>(async () =>
         {
-            await transaction.RollbackAsync();
-            return lockEntity.Status == SeatLockStatus.Released
-                ? Ok()
-                : Conflict(new { error = "A committed lock cannot be released." });
-        }
-        await _db.Database.ExecuteSqlInterpolatedAsync($@"
-            UPDATE offer_inventory.TransportOffers
-            SET SeatsAvailable = SeatsAvailable + {lockEntity.NumberOfSeats}
-            WHERE Id = {lockEntity.OfferId}");
-        await transaction.CommitAsync();
+            await using var transaction = await _db.Database.BeginTransactionAsync();
+            var released = await _db.Database.ExecuteSqlInterpolatedAsync($@"
+                UPDATE SeatLocks SET Status = 'Released'
+                WHERE LockId = {lockId} AND Status = 'Locked'");
+            if (released == 0)
+            {
+                await transaction.RollbackAsync();
+                return lockEntity.Status == SeatLockStatus.Released
+                    ? Ok()
+                    : Conflict(new { error = "A committed lock cannot be released." });
+            }
+            await _db.Database.ExecuteSqlInterpolatedAsync($@"
+                UPDATE offer_inventory.TransportOffers
+                SET SeatsAvailable = SeatsAvailable + {lockEntity.NumberOfSeats}
+                WHERE Id = {lockEntity.OfferId}");
+            await transaction.CommitAsync();
 
-        return Ok();
+            return Ok();
+        });
     }
 
     [HttpPost("commit/{lockId:guid}")]

@@ -82,8 +82,22 @@ builder.Services
 
 var app = builder.Build();
 
-// ───── 静态文件服务（允许访问 search.html）─────
-app.UseStaticFiles();
+// HTML is the application shell. Do not let browsers keep stale pages after a deployment.
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = context =>
+    {
+        if (string.Equals(
+                Path.GetExtension(context.File.Name),
+                ".html",
+                StringComparison.OrdinalIgnoreCase))
+        {
+            context.Context.Response.Headers.CacheControl = "no-store, no-cache, must-revalidate";
+            context.Context.Response.Headers.Pragma = "no-cache";
+            context.Context.Response.Headers.Expires = "0";
+        }
+    }
+});
 
 // ───── 中间件顺序非常关键！─────
 app.UseSwagger();

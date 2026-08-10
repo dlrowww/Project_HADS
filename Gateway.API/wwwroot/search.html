@@ -269,8 +269,17 @@
   <script>
     // 加载热门路线
     window.addEventListener("DOMContentLoaded", async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
       try {
-        const resp = await fetch("/api/preferencestats/top");
+        const resp = await fetch("/api/preferencestats/top", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (resp.status === 401) {
+          localStorage.removeItem("token");
+          return;
+        }
         if (!resp.ok) throw new Error(resp.statusText);
         const stats = await resp.json();
         if (stats.length > 0) {
@@ -411,7 +420,7 @@
       if (e.target.classList.contains('continue-btn')) {
         const id = e.target.dataset.id;
         window.location.href = token
-          ? `booking.html?offerId=${id}`
+          ? `booking.html?v=20260810&offerId=${id}`
           : 'login.html';
       }
     });

@@ -49,4 +49,27 @@ public class BookingController : ControllerBase
             StatusCode  = (int)response.StatusCode
         };
     }
+
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetBooking(Guid id)
+    {
+        var baseUrl = _cfg["Services:BookingApi"];
+        if (string.IsNullOrWhiteSpace(baseUrl))
+            throw new InvalidOperationException("BookingApi address is not configured!");
+
+        using var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"{baseUrl.TrimEnd('/')}/api/booking/{id}");
+        if (Request.Headers.TryGetValue("Authorization", out var authorization))
+            request.Headers.Authorization = AuthenticationHeaderValue.Parse(authorization.ToString());
+
+        var response = await _http.SendAsync(request);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        return new ContentResult
+        {
+            Content = responseBody,
+            ContentType = "application/json",
+            StatusCode = (int)response.StatusCode
+        };
+    }
 }
