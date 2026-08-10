@@ -27,7 +27,7 @@ namespace OfferInventory.Application.Services
 
         private static readonly string[] _cityIds =
         {
-            "40e19c59-8646-11e6-9066-549f350fcb0c", // Warsaw
+            /*"40e19c59-8646-11e6-9066-549f350fcb0c", // Warsaw
             "40de6982-8646-11e6-9066-549f350fcb0c", // Gdańsk
             "40de7b94-8646-11e6-9066-549f350fcb0c", // Katowice
             "40de575f-8646-11e6-9066-549f350fcb0c", // Wroclaw
@@ -101,7 +101,7 @@ namespace OfferInventory.Application.Services
             "40dbd358-8646-11e6-9066-549f350fcb0c",// = "Ingolstadt",
             "40dd1618-8646-11e6-9066-549f350fcb0c",// = "Ulm",
             "40da743c-8646-11e6-9066-549f350fcb0c",// = "Trier",
-            "40d92538-8646-11e6-9066-549f350fcb0c"// = "Worms",
+            "40d92538-8646-11e6-9066-549f350fcb0c"// = "Worms",*/
         };
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

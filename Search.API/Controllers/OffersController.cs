@@ -43,18 +43,18 @@ namespace Search.API.Controllers
             var list = await q
                 .Select(o => new TransportOfferDto
                 {
-                    ShortId        = o.ShortId,       // ← 新增映射
-                    //Id             = o.Id,
-                    DepartureTime  = o.DepartureTime,
-                    ArrivalTime    = o.ArrivalTime,
-                    Price          = o.PriceTotal,
-                    Currency       = o.Currency,
-                    Provider       = o.Provider,
-                    FromCity       = o.FromCity,
-                    ToCity         = o.ToCity,
+                    ShortId = o.ShortId,       // ← 新增映射
+                    Id = o.Id,
+                    DepartureTime = o.DepartureTime,
+                    ArrivalTime = o.ArrivalTime,
+                    Price = o.PriceTotal,
+                    Currency = o.Currency,
+                    Provider = o.Provider,
+                    FromCity = o.FromCity,
+                    ToCity = o.ToCity,
                     AvailableSeats = o.SeatsAvailable,
-                    IsPromoted     = o.IsPromoted,
-                    Transport      = o.MeansOfTransport,
+                    IsPromoted = o.IsPromoted,
+                    Transport = o.MeansOfTransport,
                     DurationHours = o.DurationHours,
                     DurationMinutes = o.DurationMinutes
 
@@ -63,5 +63,35 @@ namespace Search.API.Controllers
 
             return Ok(list);
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetOfferById(Guid id)
+        {
+            var offer = await _db.TransportOffers.FindAsync(id);
+            if (offer == null)
+                return NotFound();
+
+            return Ok(new TransportOfferDto
+            {
+                ShortId = offer.ShortId,
+                DepartureTime = offer.DepartureTime,
+                ArrivalTime = offer.ArrivalTime,
+                Price = offer.PriceTotal,
+                Currency = offer.Currency,
+                Provider = offer.Provider,
+                FromCity = offer.FromCity,
+                ToCity = offer.ToCity,
+                AvailableSeats = offer.SeatsAvailable,
+                IsPromoted = offer.IsPromoted,
+                Transport = offer.MeansOfTransport,
+                DurationHours = offer.DurationHours,
+                DurationMinutes = offer.DurationMinutes,
+                DepartureDate = offer.DepartureDate,
+                ArrivalDate = offer.ArrivalDate,  // 如果有的话
+                Id = offer.Id  // 如果需要返回原始 ID
+            });
+        }
     }
+    
+    
 }

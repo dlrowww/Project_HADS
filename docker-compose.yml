@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   mysql:
     image: mysql:8.0
@@ -13,14 +11,19 @@ services:
     restart: unless-stopped 
 
   gateway:
+    image: hads_gateway:latest
     build:
       context: .
       dockerfile: Gateway.API/Dockerfile
     ports:
       - "5035:5035"
-    depends_on:
-      - mysql
-    restart: unless-stopped 
+    volumes:
+      - ./Gateway.API/wwwroot:/app/wwwroot    # 保留静态资源映射 :contentReference[oaicite:0]{index=0}
+    environment:
+      SERVICES__BOOKINGAPI: "http://booking:5088"
+      SERVICES__USERAPI:    "http://user:8080"
+    deploy:
+      replicas: 1
 
   search:
     build:
@@ -40,6 +43,54 @@ services:
       - "5189:5189"
     depends_on:
       - mysql
+    restart: unless-stopped
+
+  booking:
+    image: hads_booking:latest
+    build:
+      context: .
+      dockerfile: Booking.API/Dockerfile
+    ports:
+      - "5088:5088"
+    environment:
+      SERVICES__PAYMENTAPI: "http://payment:5089"
+    deploy:
+      replicas: 1
+    restart: unless-stopped
+
+  payment:
+    build:
+      context: .
+      dockerfile: Payment.API/Dockerfile
+    ports:
+      - "5089:5089"
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+  availability:
+    build:
+      context: .
+      dockerfile: Availability.API/Dockerfile
+    ports:
+      - "5086:5086"
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+  user:
+    build:
+      context: .
+      dockerfile: User.API/Dockerfile
+    ports:
+      - "5080:8080"
+    depends_on:
+      - mysql
+    environment:
+      ConnectionStrings__DefaultConnection: server=mysql;port=3306;database=user_db;user=root;password=1234
+      Jwt__Key: '9n4E6p7W2c1Tz8Vq5Bm3Hs0LuYxKdFgS' 
+      Jwt__Issuer: BusCrawler
+      Jwt__Audience: BusCrawlerFrontend
     restart: unless-stopped
 
 # 这个部分是全局的 volume 定义，必须放在文件结尾

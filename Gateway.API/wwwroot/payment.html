@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Payment</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    body { display: flex; }
+    #navbar { width: 80px; }
+    .main-content {
+      flex-grow: 1;
+      max-width: 600px;
+      margin: 80px auto;
+      padding: 20px;
+      text-align: center;
+    }
+    .main-content h2 {
+      margin-bottom: 30px;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar"></div>
+
+  <div class="main-content">
+    <h2>Please Confirm Your Payment</h2>
+    <button class="btn btn-success" onclick="submitPayment(true)">✅ Payment Success</button>
+    <button class="btn btn-danger" onclick="submitPayment(false)">❌ Payment Failed</button>
+  </div>
+
+  <!-- ✅ SignalR 脚本引入 -->
+  <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@7/dist/browser/signalr.min.js"></script>
+
+  <script>
+    // 登录校验
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Please log in first.");
+      window.location.href = "login.html";
+    }
+
+    // 订单校验
+    const bookingId = localStorage.getItem("bookingId");
+    if (!bookingId) {
+      alert("No booking found. Please complete your booking first.");
+      window.location.href = "search.html";
+    }
+
+    // 导航栏加载
+    fetch("navbar.html")
+      .then((res) => res.text())
+      .then((html) => {
+        document.getElementById("navbar").outerHTML = html;
+      });
+
+    // 提交支付状态
+    function submitPayment(success) {
+      fetch("/api/payment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          bookingId: bookingId,
+          status: success ? "Success" : "Failed"
+        })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to submit payment status.");
+        return res.json();
+      })
+      .then(() => {
+        alert(success ? "Payment successful!" : "Payment failed.");
+        localStorage.removeItem("bookingId");
+        window.location.href = "profile.html";
+      })
+      .catch(err => alert(err.message));
+    }
+
+    // ✅ SignalR连接与监听
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl("/hubs/booking")
+      .build();
+
+    connection.on("BookingPaid", data => {
+      console.log("收到 BookingPaid:", data);
+      if (data.bookingId === bookingId) {
+        alert(`✅ 订单 ${data.bookingId} 已确认支付成功！`);
+        localStorage.removeItem("bookingId");
+        window.location.href = "profile.html";
+      }
+    });
+
+    connection.start().catch(err => console.error("SignalR连接失败:", err));
+  </script>
+</body>
+</html>

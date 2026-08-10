@@ -29,12 +29,12 @@ namespace Gateway.API.Controllers
         {
             // 构造转发给 Search.API 的查询字符串
             var qs = new QueryString()
-                .Add("from",           origin)
-                .Add("to",             destination)
-                .Add("date",           date.ToString("yyyy-MM-dd"))
-                .Add("transportType",  transport)
+                .Add("from", origin)
+                .Add("to", destination)
+                .Add("date", date.ToString("yyyy-MM-dd"))
+                .Add("transportType", transport)
                 .Add("numberOfPeople", people.ToString())
-                .Add("promoOnly",      promotion.ToString().ToLower());
+                .Add("promoOnly", promotion.ToString().ToLower());
 
             // 1) 直接反序列化 Search.API 返回的 JSON 为 List<OfferDto>
             List<OfferDto>? offers;
@@ -61,6 +61,23 @@ namespace Gateway.API.Controllers
 
             // 2) 原样返回（内容已是 JSON，框架会自动序列化）
             return Ok(offers);
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetOfferById(Guid id)
+        {
+            try
+            {
+                // 转发请求给 Search.API
+                var resp = await _search.GetAsync($"/api/offers/{id}");
+                var content = await resp.Content.ReadAsStringAsync();
+
+                // 原样转发状态码与内容
+                return StatusCode((int)resp.StatusCode, content);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(502, $"Gateway error: {ex.Message}");
+            }
         }
     }
 }

@@ -1,0 +1,98 @@
+<!-- offer-changes.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Offer Changes</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    body { display: flex; }
+    #navbar { width: 80px; }
+    .main-content {
+      flex-grow: 1;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar"></div>
+  <div class="main-content">
+    <h2>Results of change</h2>
+    <div id="message" class="text-danger mb-3"></div>
+    <table class="table table-bordered table-striped">
+      <thead class="table-light">
+        <tr>
+          <th>Offer ID</th>
+          <th>ID</th>
+          <th>Element</th>
+          <th>Old value</th>
+          <th>New value</th>
+          <th>Change time</th>
+        </tr>
+      </thead>
+      <tbody id="changesBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    console.log('[Frontend] Loading navbar...');
+    fetch('navbar.html')
+      .then(res => res.text())
+      .then(html => {
+        console.log('[Frontend] Navbar loaded');
+        document.getElementById('navbar').outerHTML = html;
+      })
+      .catch(err => console.error('[Frontend] Navbar load error:', err));
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const offerId = '00071b86-3593-cf99-ea5a-26b827a0df7a'; // 请替换为实际 Offer ID
+      console.log('[Frontend] Starting fetch for OfferId:', offerId);
+
+      fetch(`/api/offers/${offerId}/changes/recent`)
+        .then(async res => {
+          console.log('[Frontend] Received response status:', res.status);
+          const text = await res.text();
+          if (!res.ok) {
+            console.error('[Frontend] Error response body:', text);
+            throw new Error(`请求失败：${res.status} ${text}`);
+          }
+          console.log('[Frontend] Parsing JSON');
+          return JSON.parse(text);
+        })
+        .then(list => {
+          console.log('[Frontend] Data received:', list);
+          const msgEl = document.getElementById('message');
+          const tbody  = document.getElementById('changesBody');
+
+          if (!list.length) {
+            msgEl.textContent = '暂无变更记录';
+            console.warn('[Frontend] No change records');
+            return;
+          }
+
+          list.forEach(item => {
+            console.log('[Frontend] Rendering item:', item);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${item.offerId}</td>
+              <td>${item.id}</td>
+              <td>${item.field}</td>
+              <td>${item.oldValue}</td>
+              <td>${item.newValue}</td>
+              <td>${new Date(item.changedAt).toLocaleString()}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+          console.log('[Frontend] Rendering complete');
+        })
+        .catch(err => {
+          console.error('[Frontend] Fetch error:', err);
+          document.getElementById('message').textContent = err.message;
+        });
+    });
+  </script>
+</body>
+</html>

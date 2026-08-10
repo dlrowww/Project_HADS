@@ -1,0 +1,25 @@
+# .NET build output
+**/bin/
+**/obj/
+
+# IDE and user-specific files
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Test and analysis output
+TestResults/
+coverage/
+.sonarqube/
+
+# Logs and local environment files
+*.log
+.env
+.env.*
+!.env.example
+
+# Operating-system files
+.DS_Store
+Thumbs.db
