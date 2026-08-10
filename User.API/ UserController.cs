@@ -7,6 +7,7 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using User.API.Data;
 using User.API.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace User.API.Controllers;
 
@@ -16,11 +17,13 @@ public class UserController : ControllerBase
 {
     private readonly UserDbContext _db;
     private readonly IConfiguration _config;
+    private readonly IPasswordHasher<User_repository> _passwordHasher;
 
-    public UserController(UserDbContext db, IConfiguration config)
+    public UserController(UserDbContext db, IConfiguration config, IPasswordHasher<User_repository> passwordHasher)
     {
         _db = db;
         _config = config;
+        _passwordHasher = passwordHasher;
     }
 
     // 注册
@@ -34,9 +37,9 @@ public class UserController : ControllerBase
         {
             Id = Guid.NewGuid(),
             Username = dto.Username,
-            Password = dto.Password, // 实际项目中建议哈希！
             CreatedAt = DateTime.UtcNow
         };
+        user.Password = _passwordHasher.HashPassword(user, dto.Password);
 
         _db.Users.Add(user);
         await _db.SaveChangesAsync();
@@ -47,11 +50,22 @@ public class UserController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] UserDto dto)
     {
-        var user = await _db.Users.FirstOrDefaultAsync(u =>
-            u.Username == dto.Username && u.Password == dto.Password);
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == dto.Username);
 
         if (user == null)
             return Unauthorized(new { message = "用户名或密码错误" });
+
+        var validPassword = user.Password.StartsWith("AQAAAA", StringComparison.Ordinal)
+            ? _passwordHasher.VerifyHashedPassword(user, user.Password, dto.Password)
+                != PasswordVerificationResult.Failed
+            : user.Password == dto.Password;
+        if (!validPassword)
+            return Unauthorized(new { message = "用户名或密码错误" });
+        if (!user.Password.StartsWith("AQAAAA", StringComparison.Ordinal))
+        {
+            user.Password = _passwordHasher.HashPassword(user, dto.Password);
+            await _db.SaveChangesAsync();
+        }
 
         var claims = new[]
         {
@@ -95,4 +109,3 @@ public class UserController : ControllerBase
         });
     }
 }
-

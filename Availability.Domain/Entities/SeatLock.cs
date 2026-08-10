@@ -4,6 +4,7 @@ namespace Availability.Domain.Entities;
 public class SeatLock
 {
     public Guid LockId { get; private set; } = Guid.NewGuid();
+    public Guid BookingId { get; private set; }
     public Guid OfferId { get; private set; }
     public Guid UserId { get; private set; }
     public int NumberOfSeats { get; private set; }
@@ -15,11 +16,12 @@ public class SeatLock
     private SeatLock() { }
 
     // ✅ 业务工厂构造函数 —— EF 不使用它
-    public static SeatLock Create(Guid offerId, Guid userId, int seats, TimeSpan ttl)
-        => new(offerId, userId, seats, ttl);
+    public static SeatLock Create(Guid bookingId, Guid offerId, Guid userId, int seats, TimeSpan ttl)
+        => new(bookingId, offerId, userId, seats, ttl);
 
-    private SeatLock(Guid offerId, Guid userId, int seats, TimeSpan ttl)
+    private SeatLock(Guid bookingId, Guid offerId, Guid userId, int seats, TimeSpan ttl)
     {
+        BookingId = bookingId;
         OfferId = offerId;
         UserId = userId;
         NumberOfSeats = seats;

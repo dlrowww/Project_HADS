@@ -1,6 +1,7 @@
 # Base image for runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
+ENV ASPNETCORE_URLS=http://+:5189
 EXPOSE 5189  
 
 # Build stage

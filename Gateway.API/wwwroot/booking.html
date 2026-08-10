@@ -143,8 +143,8 @@
         return res.json();
       })
       .then(data => {
-        localStorage.setItem("bookingId", data.BookingId);
-        window.location.href = "payment.html";
+        localStorage.setItem("bookingId", data.bookingId);
+        window.location.href = "history.html";
       })
       .catch(err => alert(err.message));
     });
@@ -152,7 +152,7 @@
     // —— SignalR 实时广播 —— 
     if (offerId) {
       const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/hubs/offers", { accessTokenFactory: () => token })
+        .withUrl("/hubs/booking", { accessTokenFactory: () => token })
         .build();
 
       // 当后端广播 OfferPurchased 时

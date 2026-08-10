@@ -9,6 +9,11 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     restart: unless-stopped 
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p1234"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   gateway:
     image: hads_gateway:latest
@@ -22,6 +27,9 @@ services:
     environment:
       SERVICES__BOOKINGAPI: "http://booking:5088"
       SERVICES__USERAPI:    "http://user:8080"
+      JWT__KEY: ${JWT_KEY:?Set JWT_KEY in your environment or .env file}
+      JWT__ISSUER: BusCrawler
+      JWT__AUDIENCE: BusCrawlerFrontend
     deploy:
       replicas: 1
 
@@ -54,6 +62,17 @@ services:
       - "5088:5088"
     environment:
       SERVICES__PAYMENTAPI: "http://payment:5089"
+      SERVICES__AVAILABILITYAPI: "http://availability:5086"
+      JWT__KEY: ${JWT_KEY:?Set JWT_KEY in your environment or .env file}
+      JWT__ISSUER: BusCrawler
+      JWT__AUDIENCE: BusCrawlerFrontend
+    depends_on:
+      mysql:
+        condition: service_healthy
+      payment:
+        condition: service_started
+      availability:
+        condition: service_started
     deploy:
       replicas: 1
     restart: unless-stopped
@@ -62,8 +81,8 @@ services:
     build:
       context: .
       dockerfile: Payment.API/Dockerfile
-    ports:
-      - "5089:5089"
+    expose:
+      - "5089"
     depends_on:
       - mysql
     restart: unless-stopped
@@ -72,8 +91,8 @@ services:
     build:
       context: .
       dockerfile: Availability.API/Dockerfile
-    ports:
-      - "5086:5086"
+    expose:
+      - "5086"
     depends_on:
       - mysql
     restart: unless-stopped
@@ -88,7 +107,7 @@ services:
       - mysql
     environment:
       ConnectionStrings__DefaultConnection: server=mysql;port=3306;database=user_db;user=root;password=1234
-      Jwt__Key: '9n4E6p7W2c1Tz8Vq5Bm3Hs0LuYxKdFgS' 
+      Jwt__Key: ${JWT_KEY:?Set JWT_KEY in your environment or .env file}
       Jwt__Issuer: BusCrawler
       Jwt__Audience: BusCrawlerFrontend
     restart: unless-stopped

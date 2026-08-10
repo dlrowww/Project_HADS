@@ -10,7 +10,7 @@ namespace Payment.Domain.Entities
         public string Currency     { get; set; } = "CNY";
         public PaymentStatus Status { get; private set; } = PaymentStatus.Pending;
         public string TransactionId { get; private set; } = Guid.NewGuid().ToString();
-        public DateTime CreatedAt   { get; } = DateTime.UtcNow;
+        public DateTime CreatedAt   { get; private set; } = DateTime.UtcNow;
         public DateTime? PaidAt     { get; private set; }
 
         public void MarkSuccess()  { Status = PaymentStatus.Success;  PaidAt = DateTime.UtcNow; }

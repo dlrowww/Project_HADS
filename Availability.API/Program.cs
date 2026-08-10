@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Availability.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseUrls("http://0.0.0.0:5086");
 
 // 1. 注册控制器
 builder.Services.AddControllers();

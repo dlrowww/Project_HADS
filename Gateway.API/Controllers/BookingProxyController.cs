@@ -3,9 +3,12 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
+using System.Net.Http.Headers;
 
 [ApiController]
 [Route("api/booking-proxy")]
+[Authorize]
 public class BookingController : ControllerBase
 {
     private readonly HttpClient _http;
@@ -30,7 +33,10 @@ public class BookingController : ControllerBase
 
         // ② 发送
         var content  = new StringContent(body.GetRawText(), Encoding.UTF8, "application/json");
-        var response = await _http.PostAsync(url, content);
+        using var request = new HttpRequestMessage(HttpMethod.Post, url) { Content = content };
+        if (Request.Headers.TryGetValue("Authorization", out var authorization))
+            request.Headers.Authorization = AuthenticationHeaderValue.Parse(authorization.ToString());
+        var response = await _http.SendAsync(request);
 
         Console.WriteLine($"[Gateway] ⬅  Booking API responded {response.StatusCode}");
 

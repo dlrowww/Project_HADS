@@ -1,6 +1,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-EXPOSE 5088
+ENV ASPNETCORE_URLS=http://+:5086
+EXPOSE 5086
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0.300 AS build
 WORKDIR /src
@@ -13,4 +14,3 @@ FROM base AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "Availability.API.dll"]
-

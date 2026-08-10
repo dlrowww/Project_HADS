@@ -12,5 +12,7 @@ namespace Booking.Application.Commands
         public string ToCity { get; set; } = null!;
 
         public string CustomerName { get; set; } = null!;
+        [System.Text.Json.Serialization.JsonIgnore]
+        public Guid UserId { get; set; }
     }
 }

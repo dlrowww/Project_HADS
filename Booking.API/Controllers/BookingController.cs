@@ -3,11 +3,14 @@ using Booking.Application.CommandHandler;
 using Booking.Domain.Entities;
 using Booking.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace Booking.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class BookingController : ControllerBase
 {
     private readonly BookingDbContext _db;
@@ -27,9 +30,15 @@ public class BookingController : ControllerBase
     {
         try
         {
-            // 直接调用 handler，替代 MediatR
+            var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userIdValue, out var userId)) return Unauthorized();
+            command.UserId = userId;
             var bookingId = await _handler.HandleAsync(command);
             return Ok(new { BookingId = bookingId });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { error = ex.Message });
         }
         catch (Exception ex)
         {
@@ -51,6 +60,7 @@ public class BookingController : ControllerBase
         return Ok(new
         {
             booking.BookingId,
+            booking.UserId,
             booking.Status,
             booking.CreatedAt,
             booking.PaidAt,

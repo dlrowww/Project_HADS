@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using User.API.Data;
+using Microsoft.AspNetCore.Identity;
+using User.API.Models;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,7 +24,8 @@ builder.Services.AddDbContext<UserDbContext>(options =>
 // 2️⃣ JWT 配置
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var jwtKey = jwtSettings["Key"];
-Console.WriteLine("JWT Key = " + builder.Configuration["Jwt:Key"]);
+if (string.IsNullOrWhiteSpace(jwtKey))
+    throw new InvalidOperationException("Missing configuration: Jwt:Key");
 
 builder.Services.AddAuthentication(options =>
 {
@@ -45,6 +48,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
+builder.Services.AddScoped<IPasswordHasher<User_repository>, PasswordHasher<User_repository>>();
 
 var app = builder.Build();
 

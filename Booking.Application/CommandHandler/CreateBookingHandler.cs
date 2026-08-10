@@ -5,6 +5,8 @@ using Booking.Infrastructure;
 using Booking.Application.Sagas;
 using BookingEntity = Booking.Domain.Entities.Booking;
 using Microsoft.EntityFrameworkCore;
+using OfferInventory.Infrastructure.Data;
+using System.Net.Http.Json;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,31 +22,62 @@ namespace Booking.Application.CommandHandler
     {
         private readonly BookingDbContext         _db;
         private readonly BookingSagaCoordinator   _sagaCoordinator;
+        private readonly AppDbContext _offers;
+        private readonly IHttpClientFactory _httpFactory;
 
         public CreateBookingHandler(
             BookingDbContext db,
-            BookingSagaCoordinator sagaCoordinator)
+            BookingSagaCoordinator sagaCoordinator,
+            AppDbContext offers,
+            IHttpClientFactory httpFactory)
         {
             _db              = db;
             _sagaCoordinator = sagaCoordinator;
+            _offers = offers;
+            _httpFactory = httpFactory;
         }
 
         public async Task<Guid> HandleAsync(CreateBookingCommand cmd, CancellationToken ct = default)
         {
-            // 写入 Booking 表
+            if (cmd.UserId == Guid.Empty) throw new UnauthorizedAccessException("Authenticated user id is required.");
+            if (cmd.NumberOfSeats <= 0) throw new ArgumentOutOfRangeException(nameof(cmd.NumberOfSeats));
+
+            var offer = await _offers.TransportOffers.AsNoTracking()
+                .SingleOrDefaultAsync(o => o.Id == cmd.OfferId, ct)
+                ?? throw new KeyNotFoundException("Offer not found.");
+            var bookingId = Guid.NewGuid();
+            var lockResponse = await _httpFactory.CreateClient("availability-api").PostAsJsonAsync(
+                "/api/availability/lock",
+                new { BookingId = bookingId, cmd.OfferId, cmd.UserId, cmd.NumberOfSeats }, ct);
+            if (!lockResponse.IsSuccessStatusCode)
+                throw new InvalidOperationException(await lockResponse.Content.ReadAsStringAsync(ct));
+            var lockResult = await lockResponse.Content.ReadFromJsonAsync<LockResult>(cancellationToken: ct)
+                ?? throw new InvalidOperationException("Availability returned an invalid response.");
+
             var booking = new BookingEntity(
+                bookingId,
+                cmd.UserId,
                 customerName : cmd.CustomerName,
                 offerId      : cmd.OfferId,
                 numberOfSeats: cmd.NumberOfSeats,
-                lockId       : null
+                lockId       : lockResult.LockId
             )
             {
-                TotalPrice = cmd.TotalPrice,
-                Currency   = cmd.Currency
+                TotalPrice = offer.PriceTotal * cmd.NumberOfSeats,
+                Currency   = offer.Currency
             };
 
             _db.Bookings.Add(booking);
-            await _db.SaveChangesAsync(ct);  // ← 订票已写入 :contentReference[oaicite:0]{index=0}
+            try
+            {
+                await _db.SaveChangesAsync(ct);
+            }
+            catch
+            {
+                await _httpFactory.CreateClient("availability-api")
+                    .PostAsync($"/api/availability/release/{lockResult.LockId}", null, ct);
+                throw;
+            }
 
             // 维护 DeparturePreferenceStats 表
             var stat = await _db.DeparturePreferenceStats
@@ -73,9 +106,11 @@ namespace Booking.Application.CommandHandler
 
             // Fire-and-forget 触发支付 Saga
             //     不 await，后台自动执行扣款或补偿动作
-            _ = _sagaCoordinator.StartSagaAsync(booking.BookingId);
+            await _sagaCoordinator.StartSagaAsync(booking.BookingId, ct);
 
             return booking.BookingId;        // 回传给 Controller → Gateway → 前端
         }
+
+        private sealed record LockResult(Guid LockId);
     }
 }

@@ -25,12 +25,12 @@ namespace Booking.Application.Sagas
             _logger      = logger;
         }
 
-        public async Task StartSagaAsync(Guid bookingId)
+        public async Task StartSagaAsync(Guid bookingId, CancellationToken cancellationToken = default)
         {
             _logger.LogInformation("=== Saga START for Booking {BookingId} ===", bookingId);
 
             await using var db = _dbFactory.CreateDbContext();
-            var booking = await db.Bookings.FindAsync(bookingId);
+            var booking = await db.Bookings.FindAsync(new object[] { bookingId }, cancellationToken);
             if (booking == null)
             {
                 _logger.LogWarning("Booking {Id} not found, abort saga.", bookingId);
@@ -62,7 +62,8 @@ namespace Booking.Application.Sagas
                 _logger.LogError(ex, "Payment API unreachable for Booking {Id}", bookingId);
                 booking.MarkAsFailed();
                 db.Entry(booking).State = EntityState.Modified;
-                await db.SaveChangesAsync();
+                await db.SaveChangesAsync(cancellationToken);
+                await ReleaseLockAsync(booking.LockId, cancellationToken);
                 return;
             }
 
@@ -76,12 +77,14 @@ namespace Booking.Application.Sagas
             if (result.Success)
             {
                 booking.MarkAsPaid();
+                await CommitLockAsync(booking.LockId, cancellationToken);
                 _logger.LogInformation("Payment 成功 for Booking {Id}, TransactionId={Tx}",
                                        bookingId, result.TransactionId);
             }
             else
             {
                 booking.MarkAsFailed();
+                await ReleaseLockAsync(booking.LockId, cancellationToken);
                 _logger.LogWarning("Payment FAILED for Booking {Id}, TransactionId={Tx}",
                                    bookingId, result.TransactionId);
             }
@@ -93,7 +96,7 @@ namespace Booking.Application.Sagas
             {
                 db.Entry(booking).State = EntityState.Modified;
 
-                var rows = await db.SaveChangesAsync();
+                var rows = await db.SaveChangesAsync(cancellationToken);
                 Console.WriteLine($"[Saga] SaveChanges affected rows = {rows}");
                 _logger.LogInformation("=== Saga 结束 for Booking {BookingId} – Final={Status} ===", bookingId, booking.Status);
             }
@@ -101,6 +104,23 @@ namespace Booking.Application.Sagas
             {
                 _logger.LogError(ex, "❌ SaveChangesAsync failed for Booking {Id}", bookingId);
             }
+        }
+
+        private async Task CommitLockAsync(Guid? lockId, CancellationToken ct)
+        {
+            if (lockId is null) return;
+            var response = await _httpFactory.CreateClient("availability-api")
+                .PostAsync($"/api/availability/commit/{lockId}", null, ct);
+            response.EnsureSuccessStatusCode();
+        }
+
+        private async Task ReleaseLockAsync(Guid? lockId, CancellationToken ct)
+        {
+            if (lockId is null) return;
+            var response = await _httpFactory.CreateClient("availability-api")
+                .PostAsync($"/api/availability/release/{lockId}", null, ct);
+            if (!response.IsSuccessStatusCode)
+                _logger.LogWarning("Could not release seat lock {LockId}: {StatusCode}", lockId, response.StatusCode);
         }
 
         /* ----------- internal DTO ----------- */

@@ -5,7 +5,8 @@ namespace Booking.Domain.Entities
     public class Booking
     {
         public Guid BookingId { get; set; }         // 主键
-        public string CustomerName { get; set; }
+        public Guid UserId { get; set; }
+        public string CustomerName { get; set; } = string.Empty;
         public Guid OfferId { get; set; }           // 对应班次
         public int NumberOfSeats { get; set; }      // 订票张数
         public Guid? LockId { get; set; }            // SeatLock ID
@@ -16,9 +17,12 @@ namespace Booking.Domain.Entities
         public string Currency { get; set; } = "GDB";
 
         // 构造函数
-        public Booking(string customerName, Guid offerId, int numberOfSeats, Guid? lockId)
+        private Booking() { }
+
+        public Booking(Guid bookingId, Guid userId, string customerName, Guid offerId, int numberOfSeats, Guid? lockId)
         {
-            BookingId     = Guid.NewGuid();
+            BookingId     = bookingId;
+            UserId        = userId;
             CustomerName  = customerName;
             OfferId       = offerId;
             NumberOfSeats = numberOfSeats;
@@ -45,4 +49,3 @@ namespace Booking.Domain.Entities
         }
     }
 }
-

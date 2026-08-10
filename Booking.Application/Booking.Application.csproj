@@ -11,6 +11,7 @@
     <ProjectReference Include="..\Booking.Domain\Booking.Domain.csproj" />
     <!-- 引用 Infrastructure 层，以获取 BookingDbContext 等实体/持久化实现 -->
     <ProjectReference Include="..\Booking.Infrastructure\Booking.Infrastructure.csproj" />
+    <ProjectReference Include="..\OfferInventory.Infrastructure\OfferInventory.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

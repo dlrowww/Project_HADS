@@ -20,6 +20,7 @@ namespace Payment.Infrastructure
                 entity.HasKey(p => p.PaymentId);         // 主键
                 entity.Property(p => p.Status)
                       .HasConversion<string>();           // 枚举转字符串
+                entity.HasIndex(p => p.BookingId).IsUnique();
                 // 其他列配置留空即可
             });
         }

@@ -5,8 +5,27 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using OfferInventory.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+var jwt = builder.Configuration.GetSection("Jwt");
+var jwtKey = jwt["Key"] ?? throw new InvalidOperationException("Missing configuration: Jwt:Key");
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwt["Issuer"],
+        ValidAudience = jwt["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+    };
+});
+builder.Services.AddAuthorization();
 
 // ───── CORS 设置（如果前端运行在外部端口，比如 live-server）─────
 builder.Services.AddCors(opt =>
@@ -76,6 +95,7 @@ app.UseSwaggerUI();
 // ✅ 启用 CORS 策略（必须在 MapControllers 之前）
 app.UseCors("live-server");
 
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapReverseProxy();  // ← 必须加这行！！

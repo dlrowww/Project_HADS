@@ -23,17 +23,34 @@ public class SeatLockExpirationService : BackgroundService
             using var scope = _provider.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<AvailabilityDbContext>();
 
-            var expired = await db.SeatLocks
+            var expiredIds = await db.SeatLocks
                 .Where(s => s.Status == SeatLockStatus.Locked && s.ExpiresAt < DateTime.UtcNow)
-                .ToListAsync();
+                .Select(s => s.LockId)
+                .ToListAsync(stoppingToken);
 
-            foreach (var s in expired)
-                s.Release();
-
-            await db.SaveChangesAsync();
+            foreach (var lockId in expiredIds)
+            {
+                await using var transaction = await db.Database.BeginTransactionAsync(stoppingToken);
+                var seatLock = await db.SeatLocks.SingleOrDefaultAsync(
+                    s => s.LockId == lockId && s.Status == SeatLockStatus.Locked,
+                    stoppingToken);
+                if (seatLock is not null)
+                {
+                    var released = await db.Database.ExecuteSqlInterpolatedAsync($@"
+                        UPDATE SeatLocks SET Status = 'Released'
+                        WHERE LockId = {lockId} AND Status = 'Locked'", stoppingToken);
+                    if (released == 1)
+                    {
+                        await db.Database.ExecuteSqlInterpolatedAsync($@"
+                            UPDATE offer_inventory.TransportOffers
+                            SET SeatsAvailable = SeatsAvailable + {seatLock.NumberOfSeats}
+                            WHERE Id = {seatLock.OfferId}", stoppingToken);
+                    }
+                }
+                await transaction.CommitAsync(stoppingToken);
+            }
 
             await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
         }
     }
 }
-

@@ -3,7 +3,8 @@ using Payment.Application.DTO;
 using Payment.Domain.Entities;
 using Payment.Domain.Enums;
 using System;
-using System.Collections.Concurrent;
+using Microsoft.EntityFrameworkCore;
+using Payment.Infrastructure;
 
 namespace Payment.API.Controllers;
 
@@ -11,39 +12,44 @@ namespace Payment.API.Controllers;
 [Route("api/payments")]
 public class PaymentsController : ControllerBase
 {
-    // 临时存储，演示用；正式应换 EF Core DbContext
-    private static readonly ConcurrentDictionary<Guid, PaymentRecord> _store = new();
-
-    private readonly Random _rng = new();
+    private readonly PaymentDbContext _db;
+    public PaymentsController(PaymentDbContext db) => _db = db;
 
     [HttpPost("process")]
-    public IActionResult Process([FromBody] PaymentRequest req)
+    public async Task<IActionResult> Process([FromBody] PaymentRequest req)
     {
         if (req.Amount <= 0) return BadRequest("Invalid amount");
 
-        var record = new PaymentRecord
+        var record = await _db.Payments.SingleOrDefaultAsync(p => p.BookingId == req.BookingId);
+        if (record is not null)
+            return Ok(new { success = record.Status == PaymentStatus.Success, record.TransactionId });
+
+        record = new PaymentRecord
         {
             BookingId = req.BookingId,
             Amount    = req.Amount,
             Currency  = req.Currency
         };
-        bool success =true;           // 50% 成功率
+        bool success = true;
         if (success) record.MarkSuccess();
         else          record.MarkFailed();
 
-        _store[record.BookingId] = record;
+        _db.Payments.Add(record);
+        await _db.SaveChangesAsync();
 
         return Ok(new { success, transactionId = record.TransactionId });
     }
 
     // Saga 补偿接口
     [HttpPost("cancel")]
-    public IActionResult Cancel([FromBody] PaymentRequest req)
+    public async Task<IActionResult> Cancel([FromBody] PaymentRequest req)
     {
-        if (!_store.TryGetValue(req.BookingId, out var record))
+        var record = await _db.Payments.SingleOrDefaultAsync(p => p.BookingId == req.BookingId);
+        if (record is null)
             return NotFound("No payment to cancel");
 
         record.MarkCanceled();
+        await _db.SaveChangesAsync();
         return Ok();
     }
 }

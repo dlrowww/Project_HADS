@@ -28,8 +28,8 @@ namespace Availability.Infrastructure
 
                 // 可按需再加索引
                 e.HasIndex(p => new { p.OfferId, p.Status });
+                e.HasIndex(p => p.BookingId).IsUnique();
             });
         }
     }
 }
-
