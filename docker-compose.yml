@@ -83,6 +83,8 @@ services:
       dockerfile: Payment.API/Dockerfile
     expose:
       - "5089"
+    environment:
+      PAYMENTSIMULATION__FAILURERATE: ${PAYMENT_FAILURE_RATE:-0.0}
     depends_on:
       - mysql
     restart: unless-stopped

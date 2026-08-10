@@ -13,7 +13,15 @@ namespace Payment.API.Controllers;
 public class PaymentsController : ControllerBase
 {
     private readonly PaymentDbContext _db;
-    public PaymentsController(PaymentDbContext db) => _db = db;
+    private readonly IWebHostEnvironment _environment;
+    private readonly IConfiguration _configuration;
+
+    public PaymentsController(PaymentDbContext db, IWebHostEnvironment environment, IConfiguration configuration)
+    {
+        _db = db;
+        _environment = environment;
+        _configuration = configuration;
+    }
 
     [HttpPost("process")]
     public async Task<IActionResult> Process([FromBody] PaymentRequest req)
@@ -30,14 +38,41 @@ public class PaymentsController : ControllerBase
             Amount    = req.Amount,
             Currency  = req.Currency
         };
-        bool success = true;
+        var failureRate = Math.Clamp(_configuration.GetValue<double>("PaymentSimulation:FailureRate"), 0, 1);
+        bool success = _environment.IsDevelopment() && req.SimulateSuccess.HasValue
+            ? req.SimulateSuccess.Value
+            : Random.Shared.NextDouble() >= failureRate;
         if (success) record.MarkSuccess();
         else          record.MarkFailed();
 
         _db.Payments.Add(record);
-        await _db.SaveChangesAsync();
+        try
+        {
+            await _db.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            _db.ChangeTracker.Clear();
+            var existing = await _db.Payments.AsNoTracking()
+                .SingleAsync(p => p.BookingId == req.BookingId);
+            return Ok(new
+            {
+                success = existing.Status == PaymentStatus.Success,
+                existing.TransactionId
+            });
+        }
 
         return Ok(new { success, transactionId = record.TransactionId });
+    }
+
+    [HttpGet("booking/{bookingId:guid}")]
+    public async Task<IActionResult> GetByBooking(Guid bookingId)
+    {
+        var record = await _db.Payments.AsNoTracking()
+            .SingleOrDefaultAsync(p => p.BookingId == bookingId);
+        return record is null
+            ? NotFound()
+            : Ok(new { record.BookingId, Status = record.Status.ToString(), record.TransactionId });
     }
 
     // Saga 补偿接口

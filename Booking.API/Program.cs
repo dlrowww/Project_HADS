@@ -4,6 +4,7 @@ using Booking.Application.CommandHandler;
 using Booking.Application.Sagas;
 using OfferInventory.Infrastructure.Data;  
 using Booking.API.Hubs;
+using Booking.API.HostedServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -84,6 +85,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<CreateBookingHandler>();
 builder.Services.AddScoped<BookingSagaCoordinator>();
+builder.Services.AddHostedService<BookingReconciliationService>();
 // TODO: 注册你的 BookingService / Repository（稍后你实现了可以加上）
 
 var app = builder.Build();

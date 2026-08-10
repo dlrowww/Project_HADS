@@ -61,8 +61,7 @@ namespace Booking.Application.Sagas
             {
                 _logger.LogError(ex, "Payment API unreachable for Booking {Id}", bookingId);
                 booking.MarkAsFailed();
-                db.Entry(booking).State = EntityState.Modified;
-                await db.SaveChangesAsync(cancellationToken);
+                await SaveBookingStateAsync(db, booking, cancellationToken);
                 await ReleaseLockAsync(booking.LockId, cancellationToken);
                 return;
             }
@@ -77,6 +76,7 @@ namespace Booking.Application.Sagas
             if (result.Success)
             {
                 booking.MarkAsPaid();
+                await SaveBookingStateAsync(db, booking, cancellationToken);
                 await CommitLockAsync(booking.LockId, cancellationToken);
                 _logger.LogInformation("Payment 成功 for Booking {Id}, TransactionId={Tx}",
                                        bookingId, result.TransactionId);
@@ -84,43 +84,55 @@ namespace Booking.Application.Sagas
             else
             {
                 booking.MarkAsFailed();
+                await SaveBookingStateAsync(db, booking, cancellationToken);
                 await ReleaseLockAsync(booking.LockId, cancellationToken);
                 _logger.LogWarning("Payment FAILED for Booking {Id}, TransactionId={Tx}",
                                    bookingId, result.TransactionId);
             }
 
-            /* ---- 关键：确保 EF 一定执行 UPDATE ---- */
-            Console.WriteLine("🌟 About to call SaveChangesAsync()");
-           
-            try
-            {
-                db.Entry(booking).State = EntityState.Modified;
+            _logger.LogInformation("=== Saga END for Booking {BookingId} – Final={Status} ===", bookingId, booking.Status);
+        }
 
-                var rows = await db.SaveChangesAsync(cancellationToken);
-                Console.WriteLine($"[Saga] SaveChanges affected rows = {rows}");
-                _logger.LogInformation("=== Saga 结束 for Booking {BookingId} – Final={Status} ===", bookingId, booking.Status);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "❌ SaveChangesAsync failed for Booking {Id}", bookingId);
-            }
+        private static async Task SaveBookingStateAsync(
+            BookingDbContext db,
+            Booking.Domain.Entities.Booking booking,
+            CancellationToken ct)
+        {
+            db.Entry(booking).State = EntityState.Modified;
+            await db.SaveChangesAsync(ct);
         }
 
         private async Task CommitLockAsync(Guid? lockId, CancellationToken ct)
         {
             if (lockId is null) return;
-            var response = await _httpFactory.CreateClient("availability-api")
-                .PostAsync($"/api/availability/commit/{lockId}", null, ct);
-            response.EnsureSuccessStatusCode();
+            await SendAvailabilityCommandWithRetryAsync($"commit/{lockId}", ct);
         }
 
         private async Task ReleaseLockAsync(Guid? lockId, CancellationToken ct)
         {
             if (lockId is null) return;
-            var response = await _httpFactory.CreateClient("availability-api")
-                .PostAsync($"/api/availability/release/{lockId}", null, ct);
-            if (!response.IsSuccessStatusCode)
-                _logger.LogWarning("Could not release seat lock {LockId}: {StatusCode}", lockId, response.StatusCode);
+            await SendAvailabilityCommandWithRetryAsync($"release/{lockId}", ct);
+        }
+
+        private async Task SendAvailabilityCommandWithRetryAsync(string command, CancellationToken ct)
+        {
+            for (var attempt = 1; attempt <= 3; attempt++)
+            {
+                try
+                {
+                    var response = await _httpFactory.CreateClient("availability-api")
+                        .PostAsync($"/api/availability/{command}", null, ct);
+                    if (response.IsSuccessStatusCode) return;
+                    _logger.LogWarning("Availability command {Command} failed with {StatusCode} (attempt {Attempt})",
+                        command, response.StatusCode, attempt);
+                }
+                catch (Exception ex) when (attempt < 3 && !ct.IsCancellationRequested)
+                {
+                    _logger.LogWarning(ex, "Availability command {Command} failed (attempt {Attempt})", command, attempt);
+                }
+                if (attempt < 3) await Task.Delay(TimeSpan.FromMilliseconds(200 * attempt), ct);
+            }
+            _logger.LogError("Availability command {Command} remains unsynchronized; reconciliation will retry it", command);
         }
 
         /* ----------- internal DTO ----------- */
