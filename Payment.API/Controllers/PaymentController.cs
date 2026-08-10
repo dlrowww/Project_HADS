@@ -5,6 +5,7 @@ using Payment.Domain.Enums;
 using System;
 using Microsoft.EntityFrameworkCore;
 using Payment.Infrastructure;
+using MySqlConnector;
 
 namespace Payment.API.Controllers;
 
@@ -50,7 +51,7 @@ public class PaymentsController : ControllerBase
         {
             await _db.SaveChangesAsync();
         }
-        catch (DbUpdateException)
+        catch (DbUpdateException ex) when (IsDuplicateBookingId(ex))
         {
             _db.ChangeTracker.Clear();
             var existing = await _db.Payments.AsNoTracking()
@@ -63,6 +64,17 @@ public class PaymentsController : ControllerBase
         }
 
         return Ok(new { success, transactionId = record.TransactionId });
+    }
+
+    private static bool IsDuplicateBookingId(DbUpdateException exception)
+    {
+        for (Exception? current = exception; current is not null; current = current.InnerException)
+        {
+            if (current is MySqlException mysql && mysql.Number == 1062 &&
+                mysql.Message.Contains("IX_Payments_BookingId", StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+        return false;
     }
 
     [HttpGet("booking/{bookingId:guid}")]
