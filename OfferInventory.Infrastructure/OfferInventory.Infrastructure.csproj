@@ -18,7 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- 引用领域层 -->
     <ProjectReference Include="..\OfferInventory.Domain\OfferInventory.Domain.csproj" />
   </ItemGroup>
 </Project>

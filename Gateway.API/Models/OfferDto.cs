@@ -6,7 +6,7 @@ namespace Gateway.API.Models
     public class OfferDto
     {
         public string  ShortId        { get; set; } = "";
-        //public Guid    Id             { get; set; }
+        public Guid    Id             { get; set; }
         public string  Provider       { get; set; } = "";
         public string  Status         { get; set; } = "";
         public TimeOnly DepartureTime { get; set; }

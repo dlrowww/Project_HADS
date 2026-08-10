@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Booking</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    body {
+      display: flex;
+    }
+    #navbar {
+      width: 80px;
+    }
+    .main-content {
+      flex-grow: 1;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar"></div>
+
+  <div class="main-content">
+    <h2>Trip Summary</h2>
+    <div id="trip-summary" class="border rounded p-3 bg-light mb-4">Loading...</div>
+
+    <!-- 实时预订提醒 -->
+    <div class="mb-4">
+      <h5>Live Bookings</h5>
+      <ul id="live-updates" class="list-group"></ul>
+    </div>
+
+    <h2>Booking Details</h2>
+    <form id="booking-form">
+      <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" id="name" class="form-control" required />
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" id="email" class="form-control" required />
+      </div>
+      <div class="mb-3">
+        <label for="passengers" class="form-label">Passengers</label>
+        <input type="number" id="passengers" class="form-control" value="1" min="1" required />
+      </div>
+      <div class="mb-3">
+        <label for="notes" class="form-label">Notes</label>
+        <textarea id="notes" class="form-control"></textarea>
+      </div>
+      <button type="submit" class="btn btn-success">Book Now</button>
+    </form>
+  </div>
+
+  <!-- SignalR 客户端 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+  <script>
+    // —— 登录校验 —— 
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Please log in first.");
+      window.location.href = "login.html";
+    }
+
+    // —— 加载导航栏 —— 
+    fetch("navbar.html")
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById("navbar").outerHTML = html;
+        const current = location.pathname.split("/").pop();
+        document.querySelectorAll("#navmenu a").forEach(a => {
+          if (a.getAttribute("href") === current) a.classList.add("active");
+        });
+        const userA = document.getElementById("user-link"),
+              userText = document.getElementById("user-text");
+        if (token) {
+          userA.href = "profile.html";
+          userText.textContent = "Profile";
+        } else {
+          userA.href = "login.html";
+          userText.textContent = "Login";
+        }
+      });
+
+    // —— 读取 offerId 并显示 summary —— 
+    const params = new URLSearchParams(window.location.search);
+    const offerId = params.get("offerId");
+    if (!offerId) {
+      document.getElementById("trip-summary").innerHTML = "No offer selected.";
+    } else {
+      fetch(`/api/offers/${offerId}`)
+        .then(res => res.json())
+        .then(d => {
+          window.fromCity    = d.fromCity;
+          window.toCity      = d.toCity;
+          window.currency    = d.currency;
+          window.totalPrice  = d.price;
+          document.getElementById("trip-summary").innerHTML = `
+            <table class="table">
+              <tr><th>From</th><td>${d.fromCity}</td></tr>
+              <tr><th>To</th><td>${d.toCity}</td></tr>
+              <tr><th>Departure</th><td>${d.departureTime}</td></tr>
+              <tr><th>Arrival</th><td>${d.arrivalTime}</td></tr>
+              <tr><th>Transport</th><td>${d.transport}</td></tr>
+              <tr><th>Trip ID</th><td>${d.shortId}</td></tr>
+              <tr><th>Duration</th><td>${d.durationHours}h ${d.durationMinutes}m</td></tr>
+              <tr><th>Price</th><td>${d.price} ${d.currency}</td></tr>
+              <tr><th>Seats Left</th><td>${d.availableSeats}</td></tr>
+            </table>`;
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById("trip-summary").innerHTML = "Failed to load trip details.";
+        });
+    }
+
+    // —— 提交表单 —— 
+    document.getElementById("booking-form").addEventListener("submit", e => {
+      e.preventDefault();
+      const booking = {
+        offerId       : offerId,
+        customerName  : document.getElementById("name").value,
+        numberOfSeats : Number(document.getElementById("passengers").value),
+        currency      : window.currency,
+        totalPrice    : Number(window.totalPrice),
+        fromCity      : window.fromCity,
+        toCity        : window.toCity,
+        notes         : document.getElementById("notes").value
+      };
+      fetch("/api/booking-proxy", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization : `Bearer ${token}`
+        },
+        body: JSON.stringify(booking),
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Booking failed");
+        return res.json();
+      })
+      .then(data => {
+        localStorage.setItem("bookingId", data.BookingId);
+        window.location.href = "payment.html";
+      })
+      .catch(err => alert(err.message));
+    });
+
+    // —— SignalR 实时广播 —— 
+    if (offerId) {
+      const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/hubs/offers", { accessTokenFactory: () => token })
+        .build();
+
+      // 当后端广播 OfferPurchased 时
+      connection.on("OfferPurchased", data => {
+        console.log("new:", data);
+        const ul = document.getElementById("live-updates");
+        const li = document.createElement("li");
+        li.className = "list-group-item py-1";
+        li.textContent = `${data.Time} — ${data.Customer} buy Offer ${data.OfferId}（Booking ${data.BookingId}）`;
+        ul.insertBefore(li, ul.firstChild);
+      });
+
+      // 启动连接并加入当前 offer 分组
+      connection.start()
+        .then(() => connection.invoke("JoinOffer", offerId))
+        .catch(err => console.error("SignalR connection/subscription failed:", err));
+    }
+  </script>
+</body>
+</html>

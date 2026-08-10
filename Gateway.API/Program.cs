@@ -36,6 +36,23 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Gateway.API", Version = "v1" });
 });
 
+builder.Services.AddHttpClient("booking", c =>
+{
+    c.BaseAddress = new Uri(builder.Configuration["Services:BookingApi"]!);
+});
+
+// Program.cs  ——  Startup 逻辑
+builder.Services.AddHttpClient("user", c =>
+{
+    // 从 appsettings.json 读，也支持 Docker 环境变量覆盖
+    c.BaseAddress = new Uri(builder.Configuration["Services:UserApi"]!);
+});
+
+builder.Services
+    .AddReverseProxy()
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+
+
 // ───── 如果 Gateway 也要连接数据库（可选）─────
 var connectionString = builder.Configuration["ConnectionStrings:DefaultConnection"];
 if (!string.IsNullOrWhiteSpace(connectionString))
@@ -43,6 +60,9 @@ if (!string.IsNullOrWhiteSpace(connectionString))
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 }
+
+
+
 
 var app = builder.Build();
 
@@ -58,5 +78,7 @@ app.UseCors("live-server");
 
 app.UseAuthorization();
 app.MapControllers();
+app.MapReverseProxy();  // ← 必须加这行！！
+
 
 app.Run("http://0.0.0.0:5035");

@@ -11,14 +11,14 @@
       padding: 0;
       font-family: 'Segoe UI', sans-serif;
       background: #eeeeee;
-      /* 新增：给左侧导航留出空间 */
+      /* 给左侧导航留出空间 */
       margin-left: 80px;
       height: 100%;
     }
     .main-wrapper {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
     }
 
     /* —— header —— */
@@ -31,6 +31,18 @@
       width: calc(100% + 180px);
     }
     .header h1 { margin: 0; font-size: 32px; }
+
+    /* —— 热门路线提示 —— */
+    #top-stat {
+      background: #fffae6;
+      color: #333;
+      padding: 10px;
+      text-align: center;
+      margin-left: -170px;
+      width: calc(100% + 180px);
+      display: none;
+      font-weight: bold;
+    }
 
     /* —— controls —— */
     .controls-section {
@@ -124,7 +136,6 @@
       display: flex;
       flex-direction: column;
     }
-
     .time-row {
       position: relative;
       display: grid;
@@ -150,28 +161,25 @@
       margin: 0;
       text-align: center;
     }
-    /* 新增: 时长覆盖在线下方，不占文档流 */
     .duration-on-line {
       position: absolute;
-      top: 12px;        /* 刚好在线下方 */
+      top: 12px;
       left: 50%;
       transform: translateX(-210%);
       font-size: 13px;
       color: #555;
       white-space: nowrap;
     }
-
     .city-row {
       display: grid;
       grid-template-columns: 75px 0.66fr 90px;
       width: 100%;
       font-size: 15px;
       color: #444;
-      margin-top: 6px; /* 控制与 time-row 之间的垂直间距 */
+      margin-top: 6px;
     }
     .city-row span:first-child { grid-column: 1; }
     .city-row span:last-child  { grid-column: 3; }
-
     .id-badge {
       border: 1px solid #777;
       border-radius: 20px;
@@ -189,7 +197,6 @@
       margin: 0 6px;
       height: 16px;
     }
-
     .card-right {
       text-align: right;
       display: flex;
@@ -226,6 +233,9 @@
     <h1>BusCrawler</h1>
   </div>
 
+  <!-- 热门路线提示 -->
+  <div id="top-stat">Loading popular route…</div>
+
   <div class="controls-section">
     <div class="controls-container">
       <label>
@@ -257,22 +267,43 @@
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>
+    // 加载热门路线
+    window.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const resp = await fetch("/api/preferencestats/top");
+        if (!resp.ok) throw new Error(resp.statusText);
+        const stats = await resp.json();
+        if (stats.length > 0) {
+          const top = stats[0];
+          const div = document.getElementById("top-stat");
+          div.textContent = `Most popular routes:${top.fromCity} → ${top.toCity} （ ${top.totalCount} times）`;
+          div.style.display = "block";
+          document.getElementById("origin").value = top.fromCity;
+          document.getElementById("destination").value = top.toCity;
+        }
+      } catch (e) {
+        console.error("加载热门路线失败", e);
+         alert("failed to load popular route, please try again later.");
+      }
+    });
+
+    // 城市列表填充
     const cities = [
-  "Gdańsk", "Warsaw", "Katowice", "Wrocław", "Łódź", "Kraków", "Poznań", "Szczecin",
-  "Lublin", "Białystok", "Prague", "Brno", "Ostrava", "Plzeň", "Liberec", "Olomouc",
-  "České Budějovice", "Hradec Králové", "Berlin", "Hamburg", "Munich", "Koeln",
-  "Frankfurt am Main", "Essen", "Stuttgart", "Dortmund", "Duesseldorf", "Bremen",
-  "Hannover", "Leipzig", "Duisburg", "Nuernberg", "Dresden", "Bochum", "Wuppertal",
-  "Bielefeld", "Bonn", "Mannheim", "Karlsruhe", "Wiesbaden", "Muenster",
-  "Gelsenkirchen", "Aachen", "Moenchengladbach", "Augsburg", "Chemnitz",
-  "Braunschweig", "Krefeld", "Halle", "Kiel", "Magdeburg", "Neue Neustadt",
-  "Oberhausen", "Freiburg", "Luebeck", "Erfurt", "Hagen", "Rostock", "Kassel",
-  "Mainz", "Saarbruecken", "Herne", "Muelheim", "Osnabrueck", "Oldenburg",
-  "Potsdam", "Darmstadt", "Wuerzburg", "Regensburg", "Wolfsburg", "Ingolstadt",
-  "Ulm", "Trier", "Worms"
-];
+      "Gdańsk","Warsaw","Katowice","Wrocław","Łódź","Kraków","Poznań","Szczecin",
+      "Lublin","Białystok","Prague","Brno","Ostrava","Plzeň","Liberec","Olomouc",
+      "České Budějovice","Hradec Králové","Berlin","Hamburg","Munich","Koeln",
+      "Frankfurt am Main","Essen","Stuttgart","Dortmund","Duesseldorf","Bremen",
+      "Hannover","Leipzig","Duisburg","Nuernberg","Dresden","Bochum","Wuppertal",
+      "Bielefeld","Bonn","Mannheim","Karlsruhe","Wiesbaden","Muenster",
+      "Gelsenkirchen","Aachen","Moenchengladbach","Augsburg","Chemnitz",
+      "Braunschweig","Krefeld","Halle","Kiel","Magdeburg","Neue Neustadt",
+      "Oberhausen","Freiburg","Luebeck","Erfurt","Hagen","Rostock","Kassel",
+      "Mainz","Saarbruecken","Herne","Muelheim","Osnabrueck","Oldenburg",
+      "Potsdam","Darmstadt","Wuerzburg","Regensburg","Wolfsburg","Ingolstadt",
+      "Ulm","Trier","Worms"
+    ];
     const originSel = document.getElementById("origin");
-    const destSel   = document.getElementById("destination");
+    const destSel = document.getElementById("destination");
     cities.forEach(c => {
       originSel.innerHTML += `<option value="${c}">${c}</option>`;
       destSel.innerHTML   += `<option value="${c}">${c}</option>`;
@@ -281,17 +312,16 @@
     destSel.value   = cities[1];
 
     // 初始化 flatpickr
-    const dateInput = document.getElementById("date");
-    const today     = new Date();
-    flatpickr(dateInput, {
+    flatpickr("#date", {
       dateFormat: "Y-m-d",
-      defaultDate: today,
-      minDate: today,
+      defaultDate: new Date(),
+      minDate: new Date(),
       maxDate: new Date().fp_incr(30),
       showMonths: 2,
       allowInput: false
     });
 
+    // 搜索按钮
     document.getElementById("searchBtn").onclick = async () => {
       document.getElementById("msg").textContent = "";
       const resultsDiv = document.getElementById("results");
@@ -301,15 +331,15 @@
       const qs = new URLSearchParams({
         origin:      originSel.value,
         destination: destSel.value,
-        date:        dateInput.value,
+        date:        document.getElementById("date").value,
         transport:   "bus",
         people:      document.getElementById("people").value
       });
 
       let resp;
       try {
-        resp = await fetch(`/api/offers/search?${qs.toString()}`);
-      } catch (e) {
+        resp = await fetch(`/api/offers/search?${qs}`);
+      } catch {
         document.getElementById("msg").textContent = "Network error";
         return;
       }
@@ -332,7 +362,7 @@
             <div class="time-row">
               <span class="bold">${o.departureTime}</span>
               <div class="time-line">
-                <div class="date-on-line">${dateInput.value}</div>
+                <div class="date-on-line">${document.getElementById("date").value}</div>
               </div>
               <span class="bold">${o.arrivalTime}</span>
               <div class="duration-on-line">
@@ -344,36 +374,47 @@
               <span>${o.toCity}</span>
             </div>
             <div class="id-badge">
-              <strong>BUS</strong>
-              <span class="divider"></span>
-              <span>${o.shortId}</span>
+              <strong>BUS</strong><span class="divider"></span><span>${o.shortId}</span>
             </div>
           </div>
           <div class="card-right">
             <div class="price">${o.price} ${o.currency}</div>
             <div class="seats">Seats: ${o.availableSeats ?? ''}</div>
-            <button class="continue-btn">Continue</button>
+            <button class="continue-btn" data-id="${o.id}">Continue</button>
           </div>
         `;
         resultsDiv.appendChild(card);
       });
     };
-  </script>
 
-  <!-- 注入左侧导航 -->
-  <script>
+    // 注入左侧导航
     fetch('navbar.html')
       .then(res => res.text())
       .then(html => {
         document.getElementById('navbar').outerHTML = html;
         const currentPage = location.pathname.split('/').pop();
         document.querySelectorAll('.navmenu a').forEach(a => {
-          if (a.getAttribute('href') === currentPage) {
-            a.classList.add('active');
-          }
+          if (a.getAttribute('href') === currentPage) a.classList.add('active');
         });
       })
       .catch(console.error);
+
+    // 用户按钮 & Continue 绑定
+    const token = localStorage.getItem('token');
+    const userLink = document.getElementById('user-link');
+    const userText = document.getElementById('user-text');
+    if (userLink && userText) {
+      userLink.href = token ? 'profile.html' : 'login.html';
+      userText.textContent = token ? 'Profile' : 'Login';
+    }
+    document.addEventListener('click', e => {
+      if (e.target.classList.contains('continue-btn')) {
+        const id = e.target.dataset.id;
+        window.location.href = token
+          ? `booking.html?offerId=${id}`
+          : 'login.html';
+      }
+    });
   </script>
 </body>
 </html>

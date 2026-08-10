@@ -4,7 +4,7 @@ WORKDIR /app
 EXPOSE 5189  
 
 # Build stage
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0.300 AS build
 WORKDIR /src
 COPY . .
 RUN dotnet restore "Gateway.API/Gateway.API.csproj"
