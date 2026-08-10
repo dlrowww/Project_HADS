@@ -19,6 +19,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Availability.Domain\Availability.Domain.csproj" />
     <ProjectReference Include="..\Booking.Domain\Booking.Domain.csproj" />
+    <ProjectReference Include="..\Booking.Application\Booking.Application.csproj" />
+    <ProjectReference Include="..\Booking.Infrastructure\Booking.Infrastructure.csproj" />
     <ProjectReference Include="..\Payment.API\Payment.API.csproj" />
   </ItemGroup>
 </Project>

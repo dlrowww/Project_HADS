@@ -5,7 +5,7 @@ namespace Project_HADS.Tests;
 
 public class AvailabilityConcurrencyTests
 {
-    [Fact(Skip = "Requires a disposable MySQL server configured through HADS_TEST_MYSQL.")]
+    [MySqlFact]
     [Trait("Category", "Integration")]
     public async Task Atomic_inventory_update_allows_only_one_competing_request()
     {
@@ -56,5 +56,14 @@ public class AvailabilityConcurrencyTests
         await using var command = connection.CreateCommand();
         command.CommandText = sql;
         await command.ExecuteNonQueryAsync();
+    }
+}
+
+public sealed class MySqlFactAttribute : FactAttribute
+{
+    public MySqlFactAttribute()
+    {
+        if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("HADS_TEST_MYSQL")))
+            Skip = "Set HADS_TEST_MYSQL to a disposable MySQL server to run this test.";
     }
 }

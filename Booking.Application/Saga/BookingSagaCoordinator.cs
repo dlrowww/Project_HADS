@@ -59,10 +59,11 @@ namespace Booking.Application.Sagas
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Payment API unreachable for Booking {Id}", bookingId);
-                booking.MarkAsFailed();
-                await SaveBookingStateAsync(db, booking, cancellationToken);
-                await ReleaseLockAsync(booking.LockId, cancellationToken);
+                // Payment may have committed before its response was lost.
+                // Keep Created + Locked until reconciliation resolves the authoritative state.
+                _logger.LogError(ex,
+                    "Payment result is unknown for Booking {Id}; keeping Created state for reconciliation",
+                    bookingId);
                 return;
             }
 
